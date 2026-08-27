@@ -84,5 +84,13 @@
 
       </div>
     </section>
+
+    <section class="data-source-section">
+        <strong>Built from open data</strong>
+
+        <p>
+            Atlas of Living Australia • Victorian Ecological Vegetation Classes • AusTraits
+        </p>
+        </section>
   </main>
 </template>
