@@ -199,3 +199,23 @@ button {
   line-height: 1.6;
   margin-bottom: 28px;
 }
+
+.data-source-section {
+  display: flex;
+  align-items: center;
+  gap: 40px;
+  margin: 0 80px 40px;
+  padding: 18px 25px;
+  background-color: #f1f6e8;
+  border-radius: 10px;
+}
+
+.data-source-section strong {
+  font-size: 14px;
+}
+
+.data-source-section p {
+  margin: 0;
+  color: #667263;
+  font-size: 14px;
+}
