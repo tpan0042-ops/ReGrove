@@ -222,7 +222,6 @@ button {
 
 .app-sidebar {
   width: 190px;
-  min-height: 100vh;
   background-color: #0f4b27;
   color: white;
   padding: 25px 18px;
@@ -284,7 +283,7 @@ button {
 
 .page-layout {
   display: flex;
-  min-height: 100vh;
+  min-height: calc(100vh - 80px);
 }
 
 .page-content {
@@ -911,5 +910,154 @@ button {
   border: none;
   border-radius: 7px;
   padding: 11px 25px;
+  cursor: pointer;
+}
+
+/* Resources page */
+
+.resources-top {
+  display: flex;
+  gap: 28px;
+  align-items: flex-start;
+}
+
+.resources-left {
+  flex: 1;
+}
+
+.resources-right {
+  width: 300px;
+}
+
+
+/* Heading */
+
+.resources-heading {
+  margin-bottom: 28px;
+}
+
+.resources-heading h1 {
+  margin: 0 0 4px;
+  font-size: 30px;
+}
+
+.resources-heading h3 {
+  margin: 0 0 6px;
+  font-size: 13px;
+}
+
+.resources-heading p {
+  margin: 0;
+  color: #667263;
+  font-size: 12px;
+}
+
+
+/* Local biodiversity card */
+
+.context-card {
+  background-color: white;
+  border: 1px solid #dddcca;
+  border-radius: 10px;
+  padding: 20px;
+}
+
+.context-card h2 {
+  margin: 0 0 18px;
+  font-size: 16px;
+}
+
+.context-highlight {
+  background-color: #e3efd0;
+  border-radius: 8px;
+  padding: 16px 18px;
+}
+
+.context-highlight strong {
+  font-size: 12px;
+}
+
+.context-highlight p {
+  margin: 12px 0 0;
+  color: #667263;
+  font-size: 10px;
+  line-height: 1.6;
+  max-width: 390px;
+}
+
+.data-source-link {
+  margin: 16px 0 0 15px;
+  color: #2d5f35;
+  font-size: 9px;
+  font-weight: bold;
+}
+
+
+/* Right side */
+
+.garden-placeholder {
+  height: 155px;
+  background-color: #dfecca;
+  border-radius: 10px;
+  padding: 14px;
+  font-size: 10px;
+  color: #2d5f35;
+}
+
+.important-card {
+  background-color: #f1e9c8;
+  border-radius: 10px;
+  padding: 16px;
+  margin-top: 18px;
+}
+
+.important-card strong {
+  font-size: 11px;
+}
+
+.important-card p {
+  margin: 10px 0 0;
+  color: #667263;
+  font-size: 9px;
+  line-height: 1.6;
+}
+
+
+/* Bottom action */
+
+.context-action-title {
+  font-size: 16px;
+  margin: 32px 0 12px;
+}
+
+.context-action {
+  background-color: white;
+  border: 1px solid #dddcca;
+  border-radius: 10px;
+  padding: 15px 18px;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.context-action span {
+  font-size: 9px;
+  color: #667263;
+}
+
+.context-action p {
+  margin: 5px 0 0;
+  font-size: 11px;
+  font-weight: bold;
+}
+
+.context-action button {
+  background-color: #174726;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 9px 18px;
+  font-size: 10px;
   cursor: pointer;
 }

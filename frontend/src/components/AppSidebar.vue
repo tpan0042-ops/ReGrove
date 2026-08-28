@@ -14,7 +14,10 @@
         Explore Area
       </RouterLink>
 
-      <p>Resources</p>
+      <RouterLink to="/resources">
+        Resources
+      </RouterLink>
+      
       <RouterLink to="/planting">
         Planting Ideas
       </RouterLink>

@@ -5,6 +5,7 @@ import AssessmentView from '../views/AssessmentView.vue'
 import LocalContextView from '../views/LocalContextView.vue'
 import AreaResultView from '../views/AreaResultView.vue'
 import PlantingIdeasView from '../views/PlantingIdeasView.vue'
+import ResourcesView from '../views/ResourcesView.vue'
 
 const routes = [
   {
@@ -31,7 +32,12 @@ const routes = [
   path: '/planting',
   name: 'PlantingIdeas',
   component: PlantingIdeasView
-  }
+  },
+  {
+  path: '/resources',
+  name: 'Resources',
+  component: ResourcesView
+ }
 ]
 
 
