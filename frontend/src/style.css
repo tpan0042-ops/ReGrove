@@ -456,3 +456,122 @@ button {
   font-size: 12px;
   color: white;
 }
+
+.explore-layout {
+  display: flex;
+  gap: 45px;
+  align-items: flex-start;
+}
+
+.explore-main {
+  flex: 1;
+  max-width: 720px;
+}
+
+.explore-main h1 {
+  margin: 0 0 5px;
+  font-size: 32px;
+}
+
+.explore-main h3 {
+  margin: 0 0 6px;
+  font-size: 16px;
+}
+
+.explore-description {
+  margin-top: 0;
+  color: #667263;
+  font-size: 13px;
+}
+
+.area-search {
+  display: flex;
+  margin-top: 35px;
+}
+
+.area-search input {
+  flex: 1;
+  padding: 13px;
+  border: 1px solid #d5d8c5;
+  border-radius: 8px 0 0 8px;
+  font-size: 13px;
+}
+
+.area-search button {
+  background-color: #174726;
+  color: white;
+  border: none;
+  padding: 0 25px;
+  border-radius: 0 8px 8px 0;
+  cursor: pointer;
+}
+
+.popular-title {
+  margin: 22px 0 10px;
+  font-size: 12px;
+  color: #667263;
+}
+
+.popular-searches {
+  display: flex;
+  gap: 12px;
+}
+
+.popular-searches span {
+  background-color: #eef2df;
+  padding: 7px 16px;
+  border-radius: 15px;
+  font-size: 11px;
+  color: #667263;
+}
+
+.explore-message {
+  margin-top: 35px;
+  min-height: 250px;
+  background-color: #b9dde1;
+  border-radius: 12px;
+  padding: 35px;
+}
+
+.explore-message h2 {
+  color: white;
+  font-size: 27px;
+  margin: 0;
+}
+
+.melbourne-card {
+  width: 330px;
+  background-color: white;
+  border: 1px solid #dddcca;
+  border-radius: 12px;
+  padding: 20px;
+}
+
+.melbourne-card h3 {
+  margin-top: 0;
+}
+
+.melbourne-placeholder {
+  height: 300px;
+  background-color: #b9dde1;
+  border-radius: 8px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.melbourne-placeholder p {
+  color: #667263;
+  font-size: 13px;
+}
+
+.map-label {
+  margin-bottom: 4px;
+  font-size: 12px;
+  color: #667263;
+}
+
+.melbourne-card small {
+  color: #8a9185;
+}
