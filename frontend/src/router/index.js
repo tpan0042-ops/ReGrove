@@ -4,6 +4,7 @@ import HomeView from '../views/HomeView.vue'
 import AssessmentView from '../views/AssessmentView.vue'
 import LocalContextView from '../views/LocalContextView.vue'
 import AreaResultView from '../views/AreaResultView.vue'
+import PlantingIdeasView from '../views/PlantingIdeasView.vue'
 
 const routes = [
   {
@@ -25,6 +26,11 @@ const routes = [
     path: '/area/clayton-3168',
     name: 'AreaResult',
     component: AreaResultView
+  },
+  {
+  path: '/planting',
+  name: 'PlantingIdeas',
+  component: PlantingIdeasView
   }
 ]
 
