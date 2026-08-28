@@ -291,3 +291,116 @@ button {
   flex: 1;
   padding: 40px;
 }
+
+.assessment-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 30px;
+}
+
+.assessment-heading h1 {
+  margin: 0 0 8px;
+  font-size: 32px;
+}
+
+.assessment-heading p {
+  margin: 0 0 5px;
+  font-weight: bold;
+}
+
+.assessment-heading small {
+  color: #667263;
+}
+
+.step-info {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  font-size: 13px;
+}
+
+.progress-line {
+  width: 130px;
+  height: 3px;
+  background-color: #d5d7c9;
+}
+
+.progress-current {
+  width: 33%;
+  height: 3px;
+  background-color: #2d5f35;
+}
+
+.assessment-form {
+  background-color: white;
+  border: 1px solid #dddcca;
+  border-radius: 12px;
+  padding: 25px;
+  max-width: 650px;
+}
+
+.form-question {
+  margin-bottom: 25px;
+}
+
+.form-question h3 {
+  font-size: 15px;
+  margin-bottom: 15px;
+}
+
+.space-options {
+  display: flex;
+  gap: 15px;
+}
+
+.space-option {
+  width: 150px;
+  min-height: 95px;
+  padding: 15px;
+  border: 1px solid #d5d8c5;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.space-option strong {
+  font-size: 12px;
+}
+
+.space-option span {
+  font-size: 12px;
+  color: #667263;
+}
+
+.sunlight-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.sunlight-options label {
+  background-color: #f5f5eb;
+  border: 1px solid #d5d8c5;
+  border-radius: 6px;
+  padding: 10px 14px;
+  font-size: 12px;
+}
+
+.form-actions {
+  text-align: right;
+}
+
+.next-button {
+  background-color: #1f5a30;
+  color: white;
+  border: none;
+  border-radius: 7px;
+  padding: 11px 24px;
+  cursor: pointer;
+}
+
+.next-button:hover {
+  background-color: #174726;
+}
