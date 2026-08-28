@@ -584,8 +584,22 @@ button {
   color: #8a9185;
 }
 
+/* Clayton area result page */
+
 .area-result-heading {
-  margin-bottom: 30px;
+  margin-bottom: 28px;
+}
+
+.back-area-link {
+  display: block;
+  color: #667263;
+  text-decoration: none;
+  font-size: 11px;
+  margin-bottom: 22px;
+}
+
+.back-area-link:hover {
+  color: #2d5f35;
 }
 
 .area-result-heading h1 {
@@ -601,58 +615,77 @@ button {
 .area-result-heading p {
   margin-top: 0;
   color: #667263;
-  font-size: 13px;
+  font-size: 12px;
 }
+
+
+/* Summary information */
 
 .area-summary {
   display: flex;
   background-color: #e7efd7;
   border-radius: 12px;
-  padding: 22px 25px;
-  gap: 20px;
+  padding: 25px 28px;
+  gap: 25px;
 }
 
 .summary-item {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 7px;
+  gap: 10px;
 }
 
 .summary-item span {
   color: #667263;
-  font-size: 12px;
+  font-size: 11px;
 }
 
 .summary-item strong {
   color: #2d5f35;
-  font-size: 15px;
+  font-size: 16px;
 }
+
+
+/* Result cards */
 
 .result-details {
   display: flex;
   gap: 25px;
-  margin-top: 25px;
+  margin-top: 28px;
+  align-items: stretch;
 }
 
-.wildlife-card {
-  width: 50%;
+.wildlife-card,
+.vegetation-card {
+  flex: 1;
   background-color: white;
   border: 1px solid #dddcca;
   border-radius: 12px;
-  padding: 22px;
+  padding: 25px;
+  min-height: 260px;
 }
 
-.wildlife-card h2 {
+.wildlife-card h2,
+.vegetation-card h2 {
   font-size: 16px;
-  margin-top: 0;
-  margin-bottom: 20px;
+  margin: 0 0 7px;
+}
+
+
+/* Wildlife card */
+
+.wildlife-note {
+  margin: 0 0 26px;
+  color: #8a9185;
+  font-size: 10px;
+  text-transform: uppercase;
 }
 
 .wildlife-groups {
   display: flex;
   justify-content: space-between;
-  gap: 15px;
+  gap: 10px;
 }
 
 .wildlife-item {
@@ -661,29 +694,70 @@ button {
 }
 
 .wildlife-circle {
-  width: 46px;
-  height: 46px;
+  width: 42px;
+  height: 42px;
   border-radius: 50%;
-  margin: 0 auto 10px;
+  margin: 0 auto 12px;
 }
 
 .circle-yellow {
-  background-color: #e2c951;
-}
-
-.circle-light-yellow {
-  background-color: #eadf8c;
+  background-color: #e8c33f;
 }
 
 .circle-green {
-  background-color: #c9dcaa;
-}
-
-.circle-gold {
-  background-color: #ddb94c;
+  background-color: #dce9c6;
 }
 
 .wildlife-item strong {
-  font-size: 11px;
+  font-size: 10px;
+  color: #526a50;
+}
+
+
+/* Vegetation card */
+
+.vegetation-card h2 {
+  margin-bottom: 24px;
+}
+
+.vegetation-row {
+  margin-bottom: 20px;
+}
+
+.vegetation-row span {
+  display: block;
   color: #667263;
+  font-size: 11px;
+  margin-bottom: 7px;
+}
+
+.vegetation-bar {
+  width: 100%;
+  height: 5px;
+  background-color: #e5e5da;
+  border-radius: 5px;
+}
+
+.vegetation-fill {
+  height: 5px;
+  background-color: #2d6b3d;
+  border-radius: 5px;
+}
+
+.vegetation-fill-1 {
+  width: 38%;
+}
+
+.vegetation-fill-2 {
+  width: 31%;
+}
+
+.vegetation-fill-3 {
+  width: 24%;
+}
+
+.vegetation-note {
+  color: #8a9185;
+  font-size: 10px;
+  margin: 25px 0 0;
 }
