@@ -1,9 +1,20 @@
 <script setup>
 import { ref } from 'vue'
 
+const emit = defineEmits(['next-step'])
+
 // Store the user's selections.
 const spaceType = ref('')
 const sunlight = ref('')
+
+// Check the first step before continuing.
+const goNext = () => {
+  if (spaceType.value === '' || sunlight.value === '') {
+    return
+  }
+
+  emit('next-step')
+}
 </script>
 
 <template>
@@ -92,7 +103,10 @@ const sunlight = ref('')
     </div>
 
     <div class="form-actions">
-      <button class="next-button">
+      <button
+        class="next-button"
+        @click="goNext"
+      >
         Next →
       </button>
     </div>
