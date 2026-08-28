@@ -21,13 +21,25 @@ import AssessmentForm from '../components/AssessmentForm.vue'
 
         <div class="step-info">
           <span>Step 1 of 3</span>
+
           <div class="progress-line">
             <div class="progress-current"></div>
           </div>
         </div>
       </div>
 
-      <AssessmentForm />
+      <div class="assessment-body">
+
+        <AssessmentForm />
+
+        <div class="myspace-image-card">
+          <div class="myspace-image-text">
+            <strong>Small spaces matter</strong>
+            <p>Local biodiversity can support your community.</p>
+          </div>
+        </div>
+
+      </div>
 
     </main>
 

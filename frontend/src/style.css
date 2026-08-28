@@ -404,3 +404,42 @@ button {
 .next-button:hover {
   background-color: #174726;
 }
+
+.assessment-body {
+  display: flex;
+  gap: 30px;
+  align-items: flex-start;
+}
+
+.myspace-image-card {
+  width: 360px;
+  min-height: 350px;
+
+  background-image: url('./assets/MySpace.png');
+  background-size: cover;
+  background-position: center;
+
+  border-radius: 12px;
+  padding: 25px;
+
+  display: flex;
+  align-items: flex-end;
+}
+
+.myspace-image-text {
+  background-color: #174726;
+  color: white;
+  padding: 15px;
+  border-radius: 8px;
+  max-width: 220px;
+}
+
+.myspace-image-text strong {
+  font-size: 14px;
+}
+
+.myspace-image-text p {
+  margin: 5px 0 0;
+  font-size: 12px;
+  color: white;
+}
