@@ -38,9 +38,15 @@ const searchArea = ref('')
           <p class="popular-title">Popular searches</p>
 
           <div class="popular-searches">
-            <span>Clayton 3168</span>
-            <span>Blackburn 3130</span>
-            <span>Parkville 3052</span>
+            <RouterLink to="/area/clayton-3168">
+              Clayton 3168
+            </RouterLink>
+            <RouterLink to="/area/blackburn-3130">
+              Blackburn 3130
+            </RouterLink>
+            <RouterLink to="/area/parkville-3052">
+              Parkville 3052
+            </RouterLink>
           </div>
 
           <div class="explore-message">

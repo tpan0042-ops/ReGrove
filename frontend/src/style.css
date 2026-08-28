@@ -517,12 +517,14 @@ button {
   gap: 12px;
 }
 
-.popular-searches span {
+.popular-searches span,
+.popular-searches a {
   background-color: #eef2df;
   padding: 7px 16px;
   border-radius: 15px;
   font-size: 11px;
   color: #667263;
+  text-decoration: none;
 }
 
 .explore-message {
