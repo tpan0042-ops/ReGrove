@@ -761,3 +761,155 @@ button {
   font-size: 10px;
   margin: 25px 0 0;
 }
+
+/* Planting Ideas page */
+
+.planting-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 30px;
+  margin-bottom: 15px;
+}
+
+.planting-heading h1 {
+  margin: 0 0 5px;
+  font-size: 32px;
+}
+
+.planting-heading h3 {
+  margin: 0 0 7px;
+  font-size: 16px;
+}
+
+.planting-heading p {
+  margin: 0;
+  color: #667263;
+  font-size: 12px;
+}
+
+.planting-banner {
+  width: 300px;
+  height: 90px;
+  background-color: #e5a3b3;
+  border-radius: 12px;
+}
+
+
+/* Filter buttons */
+
+.plant-filters {
+  display: flex;
+  gap: 14px;
+  margin-top: 5px;
+  margin-bottom: 25px;
+}
+
+.plant-filters button {
+  background-color: white;
+  color: #667263;
+  border: 1px solid #dddcca;
+  border-radius: 18px;
+  padding: 8px 18px;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.plant-filters .filter-active {
+  background-color: #dfecca;
+  color: #2d5f35;
+  border: none;
+}
+
+
+/* Plant cards */
+
+.plant-cards {
+  display: flex;
+  gap: 20px;
+}
+
+.plant-card {
+  flex: 1;
+  background-color: white;
+  border: 1px solid #dddcca;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.plant-card-image {
+  height: 150px;
+}
+
+.green-image {
+  background-color: #75a34d;
+}
+
+.pink-image {
+  background-color: #e5a3b3;
+}
+
+.plant-card-content {
+  padding: 16px;
+}
+
+.plant-card-content h3 {
+  margin: 0 0 5px;
+  font-size: 14px;
+}
+
+.plant-type {
+  margin: 0 0 15px;
+  color: #8a9185;
+  font-size: 10px;
+}
+
+.plant-tag {
+  display: inline-block;
+  background-color: #eef3df;
+  color: #2d5f35;
+  border-radius: 14px;
+  padding: 6px 14px;
+  font-size: 10px;
+  margin-bottom: 18px;
+}
+
+.plant-info {
+  color: #8a9185;
+  font-size: 10px;
+  line-height: 1.8;
+}
+
+
+/* Bottom action */
+
+.planting-action {
+  margin-top: 28px;
+  background-color: #dfecca;
+  border-radius: 10px;
+  padding: 20px 25px;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.planting-action h3 {
+  margin: 0 0 6px;
+  font-size: 15px;
+}
+
+.planting-action p {
+  margin: 0;
+  color: #667263;
+  font-size: 11px;
+}
+
+.planting-action button {
+  background-color: #174726;
+  color: white;
+  border: none;
+  border-radius: 7px;
+  padding: 11px 25px;
+  cursor: pointer;
+}
