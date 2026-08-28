@@ -15,7 +15,9 @@
       </RouterLink>
 
       <p>Resources</p>
-      <p>Planting Ideas</p>
+      <RouterLink to="/planting">
+        Planting Ideas
+      </RouterLink>
       <p>My Plan</p>
       <p>Profile</p>
     </nav>
