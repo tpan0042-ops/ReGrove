@@ -628,3 +628,62 @@ button {
   color: #2d5f35;
   font-size: 15px;
 }
+
+.result-details {
+  display: flex;
+  gap: 25px;
+  margin-top: 25px;
+}
+
+.wildlife-card {
+  width: 50%;
+  background-color: white;
+  border: 1px solid #dddcca;
+  border-radius: 12px;
+  padding: 22px;
+}
+
+.wildlife-card h2 {
+  font-size: 16px;
+  margin-top: 0;
+  margin-bottom: 20px;
+}
+
+.wildlife-groups {
+  display: flex;
+  justify-content: space-between;
+  gap: 15px;
+}
+
+.wildlife-item {
+  flex: 1;
+  text-align: center;
+}
+
+.wildlife-circle {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  margin: 0 auto 10px;
+}
+
+.circle-yellow {
+  background-color: #e2c951;
+}
+
+.circle-light-yellow {
+  background-color: #eadf8c;
+}
+
+.circle-green {
+  background-color: #c9dcaa;
+}
+
+.circle-gold {
+  background-color: #ddb94c;
+}
+
+.wildlife-item strong {
+  font-size: 11px;
+  color: #667263;
+}

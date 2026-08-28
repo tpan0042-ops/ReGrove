@@ -41,6 +41,38 @@ import AppSidebar from '../components/AppSidebar.vue'
 
       </section>
 
+      <section class="result-details">
+
+        <div class="wildlife-card">
+            <h2>What lives here?</h2>
+
+            <div class="wildlife-groups">
+
+            <div class="wildlife-item">
+                <div class="wildlife-circle circle-yellow"></div>
+                <strong>Birds</strong>
+            </div>
+
+            <div class="wildlife-item">
+                <div class="wildlife-circle circle-light-yellow"></div>
+                <strong>Pollinators</strong>
+            </div>
+
+            <div class="wildlife-item">
+                <div class="wildlife-circle circle-green"></div>
+                <strong>Frogs</strong>
+            </div>
+
+            <div class="wildlife-item">
+                <div class="wildlife-circle circle-gold"></div>
+                <strong>Other wildlife</strong>
+            </div>
+
+            </div>
+        </div>
+
+        </section>
+
     </main>
 
   </div>
