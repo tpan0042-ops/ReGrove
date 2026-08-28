@@ -583,3 +583,48 @@ button {
 .melbourne-card small {
   color: #8a9185;
 }
+
+.area-result-heading {
+  margin-bottom: 30px;
+}
+
+.area-result-heading h1 {
+  margin: 0 0 5px;
+  font-size: 32px;
+}
+
+.area-result-heading h3 {
+  margin: 0 0 6px;
+  font-size: 16px;
+}
+
+.area-result-heading p {
+  margin-top: 0;
+  color: #667263;
+  font-size: 13px;
+}
+
+.area-summary {
+  display: flex;
+  background-color: #e7efd7;
+  border-radius: 12px;
+  padding: 22px 25px;
+  gap: 20px;
+}
+
+.summary-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.summary-item span {
+  color: #667263;
+  font-size: 12px;
+}
+
+.summary-item strong {
+  color: #2d5f35;
+  font-size: 15px;
+}
