@@ -24,22 +24,21 @@ const routes = [
     component: LocalContextView
   },
   {
-    path: '/area/clayton-3168',
+    path: '/area/:postcode',
     name: 'AreaResult',
     component: AreaResultView
   },
   {
-  path: '/planting',
-  name: 'PlantingIdeas',
-  component: PlantingIdeasView
+    path: '/planting',
+    name: 'PlantingIdeas',
+    component: PlantingIdeasView
   },
   {
-  path: '/resources',
-  name: 'Resources',
-  component: ResourcesView
- }
+    path: '/resources',
+    name: 'Resources',
+    component: ResourcesView
+  }
 ]
-
 
 const router = createRouter({
   history: createWebHistory(),

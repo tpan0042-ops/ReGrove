@@ -1,9 +1,31 @@
 <script setup>
 import { ref } from 'vue'
+import { useRouter } from 'vue-router'
 import AppSidebar from '../components/AppSidebar.vue'
+
+const router = useRouter()
 
 // Store the suburb or postcode entered by the user.
 const searchArea = ref('')
+
+// Open the result page for the entered postcode.
+const searchLocalArea = () => {
+  const value = searchArea.value.trim()
+
+  if (!value) {
+    return
+  }
+
+  // If the user enters something like "Clayton 3168",
+  // use the postcode at the end.
+  const postcodeMatch = value.match(/\b\d{4}\b/)
+
+  if (postcodeMatch) {
+    router.push(`/area/${postcodeMatch[0]}`)
+  } else {
+    router.push(`/area/${encodeURIComponent(value)}`)
+  }
+}
 </script>
 
 <template>
@@ -28,9 +50,13 @@ const searchArea = ref('')
               type="text"
               v-model="searchArea"
               placeholder="Search suburb or postcode"
+              @keyup.enter="searchLocalArea"
             >
 
-            <button type="button">
+            <button
+              type="button"
+              @click="searchLocalArea"
+            >
               Search
             </button>
           </div>
@@ -38,13 +64,15 @@ const searchArea = ref('')
           <p class="popular-title">Popular searches</p>
 
           <div class="popular-searches">
-            <RouterLink to="/area/clayton-3168">
+            <RouterLink to="/area/3168">
               Clayton 3168
             </RouterLink>
-            <RouterLink to="/area/blackburn-3130">
+
+            <RouterLink to="/area/3130">
               Blackburn 3130
             </RouterLink>
-            <RouterLink to="/area/parkville-3052">
+
+            <RouterLink to="/area/3052">
               Parkville 3052
             </RouterLink>
           </div>
@@ -71,6 +99,5 @@ const searchArea = ref('')
       </div>
 
     </main>
-
   </div>
 </template>

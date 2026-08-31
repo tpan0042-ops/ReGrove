@@ -1,7 +1,18 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 import psycopg2
 
+
 app = FastAPI()
+
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 @app.get("/")
@@ -13,11 +24,11 @@ def read_root():
 def get_plants():
     # Connect to the local PostgreSQL database.
     connection = psycopg2.connect(
-    host="localhost",
-    port="5433",
-    database="regrove",
-    user="regrove",
-    password="regrove_local"
+        host="localhost",
+        port="5433",
+        database="regrove",
+        user="regrove",
+        password="regrove_local"
     )
 
     # Read the sample plant data.
@@ -46,6 +57,7 @@ def get_plants():
     connection.close()
 
     return plants
+
 
 @app.get("/local-species/{postcode}")
 def get_local_species(postcode: str):
@@ -92,10 +104,39 @@ def get_local_species(postcode: str):
             "evidence_summary": row[5]
         })
 
+    # Find vegetation context linked to the postcode.
+    cursor.execute("""
+        SELECT
+            ec.evc_code,
+            ec.evc_name,
+            ec.conservation_status,
+            pec.reference_year,
+            pec.overlap_percent
+        FROM postcode_evc_context pec
+        JOIN evc_class ec
+            ON pec.evc_id = ec.evc_id
+        WHERE pec.postcode = %s
+        ORDER BY pec.overlap_percent DESC
+    """, (postcode,))
+
+    vegetation_rows = cursor.fetchall()
+
+    vegetation = []
+
+    for row in vegetation_rows:
+        vegetation.append({
+            "evc_code": row[0],
+            "evc_name": row[1],
+            "conservation_status": row[2],
+            "reference_year": row[3],
+            "overlap_percent": float(row[4])
+        })
+
     cursor.close()
     connection.close()
 
     return {
         "postcode": postcode,
-        "species": species
+        "species": species,
+        "vegetation": vegetation
     }
