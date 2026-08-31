@@ -7,17 +7,17 @@ class Candidate:
     common_name: str
     evidence_source_count: int
     suitability_status: str
-    traits: dict[str, str]   # e.g. {"mature_size": "small"}
+    traits: dict[str, list[str]]   
 
 @dataclass
 #to store user's backyard context for scoring
 class UserContext:
-    property_size: str        # from survey
-    gaps: set[int]             # habitat_requirement_ids
+    property_size: str        #from survey
+    gaps: set[int]            #habitat_requirement_ids
 
 @dataclass
 #to store a scored candidate with reasons for the score
 class ScoredCandidate:
     candidate: Candidate
     score: float
-    reasons: list[str]         # human-readable, for the "why recommended" UI
+    reasons: list[str]         #human-readable, for the "why recommended" UI
