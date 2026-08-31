@@ -4,10 +4,7 @@ from scoring.models import UserContext
 from scoring.rank import rank_candidates
 
 def test_sample_data_returns_expected_plants():
-    # Postcode 3233 and habitat_requirement ids 1, 2 correspond to the
-    # SAMPLE bioregion / SAMPLE dense refuge / SAMPLE nectar resource rows
-    # in 001_sample_data.sql — check actual ids via:
-    #   SELECT habitat_requirement_id, requirement_name FROM habitat_requirement;
+    #Postcode 3233 and habitat_requirement ids 1, 2 correspond to the SAMPLE bioregion / SAMPLE dense refuge / SAMPLE nectar resource rows in 001_sample_data.sql
     rows = fetch_candidates(postcode="3233", habitat_requirement_ids=[1, 2])
     candidates = rows_to_candidates(rows)
 
