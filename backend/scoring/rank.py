@@ -18,7 +18,7 @@ def score_candidate(candidate: Candidate, user: UserContext) -> ScoredCandidate:
     mature_size = candidate.traits.get("mature_size")
     if user.property_size == "small" and mature_size == "large":
         score -= SIZE_MISMATCH_PENALTY
-        reasons.append("Caution: mature size may not suit a small property")
+        reasons.append("Caution: large plant size may not suit a small property")
 
     return ScoredCandidate(candidate=candidate, score=score, reasons=reasons)
 
