@@ -1,5 +1,6 @@
 <script setup>
 import AppSidebar from '../components/AppSidebar.vue'
+import ContextNotice from '../components/ContextNotice.vue'
 </script>
 
 <template>
@@ -24,6 +25,8 @@ import AppSidebar from '../components/AppSidebar.vue'
         </p>
 
       </div>
+
+      <ContextNotice suburb="Clayton" />
 
       <!-- Area data summary -->
       <section class="area-summary">

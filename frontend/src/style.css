@@ -761,3 +761,113 @@ button {
   font-size: 10px;
   margin: 25px 0 0;
 }
+.species-card {
+  background-color: white;
+  border: 1px solid #dddcca;
+  border-radius: 18px;
+  padding: 20px;
+  flex: 1;
+}
+
+.species-card-image {
+  background-color: #e2efd1;
+  color: #2d5f35;
+  font-size: 13px;
+  font-weight: bold;
+  padding: 14px;
+  border-radius: 10px;
+  min-height: 140px;
+  margin-bottom: 20px;
+}
+
+.species-card h3 {
+  font-size: 16px;
+  margin: 0 0 6px;
+}
+
+.species-card p {
+  color: #667263;
+  font-size: 13px;
+  line-height: 1.5;
+  margin: 0 0 16px;
+}
+
+.species-tag {
+  display: inline-block;
+  background-color: #e2efd1;
+  color: #2d5f35;
+  font-size: 11px;
+  font-weight: bold;
+  padding: 6px 12px;
+  border-radius: 15px;
+}
+.planting-heading {
+  display: flex;
+  justify-content: space-between;
+  gap: 40px;
+  margin-bottom: 35px;
+}
+
+.planting-heading-text h1 {
+  margin: 0 0 6px;
+  font-size: 28px;
+}
+
+.planting-heading-text p {
+  margin: 0;
+  color: #667263;
+  font-size: 13px;
+}
+
+.planting-heading-image {
+  width: 280px;
+  min-height: 160px;
+  background-color: #e2efd1;
+  color: #2d5f35;
+  font-size: 13px;
+  font-weight: bold;
+  padding: 14px;
+  border-radius: 12px;
+}
+
+.planting-section-intro {
+  margin-bottom: 20px;
+}
+
+.planting-section-intro h2 {
+  margin: 0 0 4px;
+  font-size: 18px;
+}
+
+.planting-section-intro p {
+  margin: 0;
+  color: #8a9185;
+  font-size: 12px;
+}
+
+.species-card-row {
+  display: flex;
+  gap: 25px;
+  margin-bottom: 30px;
+}
+
+.future-feature-banner {
+  background-color: #e5efd5;
+  border-radius: 10px;
+  padding: 18px 22px;
+  display: flex;
+  gap: 20px;
+  align-items: center;
+}
+
+.future-feature-banner strong {
+  color: #2d5f35;
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.future-feature-banner p {
+  margin: 0;
+  color: #667263;
+  font-size: 13px;
+}
