@@ -4,7 +4,6 @@
 
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import AppSidebar from '../components/AppSidebar.vue'
 
 const router = useRouter()
 
@@ -34,12 +33,20 @@ const searchLocalArea = () => {
 </script>
 
 <template>
-  <div class="page-layout">
+  <!-- This page does not use AppSidebar anymore, same as My Space.
+       It is now a full background photo with the search card and the
+       Greater Melbourne card floating on top of it. -->
+  <section class="explore-page">
+    <img
+      class="explore-page-image"
+      src="../assets/EA_background.png"
+      alt="A garden path lined with native flowers and trees"
+    />
 
-    <!-- Reuse the main sidebar for navigation. -->
-    <AppSidebar />
+    <!-- Same light tint layer as the My Space page. -->
+    <div class="explore-page-tint"></div>
 
-    <main class="page-content">
+    <div class="explore-page-overlay">
 
       <div class="explore-layout">
 
@@ -69,21 +76,32 @@ const searchLocalArea = () => {
             </button>
           </div>
 
-          <!-- Quick links for some example areas. -->
+          <!-- Quick links for some example areas, plus a bigger Explore
+               Area button that runs the same search. -->
           <p class="popular-title">Popular searches</p>
 
-          <div class="popular-searches">
-            <RouterLink to="/area/3168">
-              Clayton 3168
-            </RouterLink>
+          <div class="popular-row">
+            <div class="popular-searches">
+              <RouterLink to="/area/3168">
+                Clayton 3168
+              </RouterLink>
 
-            <RouterLink to="/area/3130">
-              Blackburn 3130
-            </RouterLink>
+              <RouterLink to="/area/3175">
+                Dandenong 3175
+              </RouterLink>
 
-            <RouterLink to="/area/3052">
-              Parkville 3052
-            </RouterLink>
+              <RouterLink to="/area/3199">
+                Frankston 3199
+              </RouterLink>
+            </div>
+
+            <button
+              type="button"
+              class="next-button"
+              @click="searchLocalArea"
+            >
+              Explore Area
+            </button>
           </div>
 
           <!-- Short message used in the Explore Area design. -->
@@ -99,16 +117,23 @@ const searchLocalArea = () => {
         <div class="melbourne-card">
           <h3>Greater Melbourne</h3>
 
-          <div class="melbourne-placeholder">
-            <p>Local biodiversity area</p>
-          </div>
+          <div class="melbourne-placeholder"></div>
 
-          <p class="map-label">Illustrative area map</p>
-          <small>Actual results depend on postcode entered.</small>
+          <p class="map-label">Illustrative area grid</p>
+          <small>Actual results depend on available datasets.</small>
         </div>
 
       </div>
 
-    </main>
-  </div>
+      <!-- "Your impact" used to live in the sidebar. Show it here now
+           since this page does not have a sidebar anymore. -->
+      <div class="impact-box floating-impact">
+        <strong>Your impact</strong>
+        <h3>0</h3>
+        <p>Actions completed</p>
+        <p>Prototype</p>
+      </div>
+
+    </div>
+  </section>
 </template>

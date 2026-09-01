@@ -4,7 +4,6 @@
 
 import { ref } from 'vue'
 
-import AppSidebar from '../components/AppSidebar.vue'
 import AssessmentForm from '../components/AssessmentForm.vue'
 
 // Store the current assessment step.
@@ -21,84 +20,88 @@ const nextStep = () => {
 </script>
 
 <template>
-  <div class="page-layout">
+  <!-- This page does not use AppSidebar anymore. It is now one big
+       background photo with the form and other pieces on top of it. -->
+  <section class="myspace-page">
+    <img
+      class="myspace-page-image"
+      src="../assets/MySpace.png"
+      alt="A cozy balcony garden with a rattan chair and potted plants"
+    />
 
-    <!-- Reuse the main sidebar for navigation. -->
-    <AppSidebar />
+    <!-- Gray tint sitting on top of the photo, matching the design. -->
+    <div class="myspace-page-tint"></div>
 
-    <main class="page-content">
+    <div class="myspace-page-overlay">
 
-      <!-- Show the assessment title and current progress. -->
-      <div class="assessment-heading">
-        <div>
+      <!-- Heading and the form share this column so they always line up
+           at the same left position and center width, matching the design. -->
+      <div class="myspace-column">
+
+        <!-- Show the assessment title, centered above the card. -->
+        <div class="assessment-heading">
           <h1>My Space</h1>
-          <p>Tell us about your outdoor space</p>
-          <small>
-            This helps us understand your space and shape locally relevant guidance.
-          </small>
+          <p>Tell us about your space</p>
         </div>
 
-        <!-- Update the step number and progress line with currentStep. -->
-        <div class="step-info">
-          <span>Step {{ currentStep }} of 3</span>
+        <!-- Show the content for the current assessment step. -->
+        <div class="assessment-body">
 
-          <div class="progress-line">
-            <div
-              v-if="currentStep === 1"
-              class="progress-step-1"
-            ></div>
+          <!-- Step 1 uses the separate AssessmentForm component. -->
+          <AssessmentForm
+            v-if="currentStep === 1"
+            @next-step="nextStep"
+          />
 
-            <div
-              v-if="currentStep === 2"
-              class="progress-step-2"
-            ></div>
-
-            <div
-              v-if="currentStep === 3"
-              class="progress-step-3"
-            ></div>
+          <!-- Step 2 is currently a placeholder for later questions. -->
+          <div
+            v-if="currentStep === 2"
+            class="assessment-form"
+          >
+            <h2>Step 2</h2>
+            <p>The next assessment questions will go here.</p>
           </div>
+
+          <!-- Step 3 is currently a placeholder for the final questions. -->
+          <div
+            v-if="currentStep === 3"
+            class="assessment-form"
+          >
+            <h2>Step 3</h2>
+            <p>The final assessment questions will go here.</p>
+          </div>
+
         </div>
       </div>
 
-      <!-- Show the content for the current assessment step. -->
-      <div class="assessment-body">
+      <!-- Step counter and progress bar, now floating over the photo. -->
+      <div class="myspace-progress">
+        <span>{{ currentStep }} of 3</span>
 
-        <!-- Step 1 uses the separate AssessmentForm component. -->
-        <AssessmentForm
-          v-if="currentStep === 1"
-          @next-step="nextStep"
-        />
-
-        <!-- Step 2 is currently a placeholder for later questions. -->
-        <div
-          v-if="currentStep === 2"
-          class="assessment-form"
-        >
-          <h2>Step 2</h2>
-          <p>The next assessment questions will go here.</p>
+        <div class="progress-line">
+          <div v-if="currentStep === 1" class="progress-step-1"></div>
+          <div v-if="currentStep === 2" class="progress-step-2"></div>
+          <div v-if="currentStep === 3" class="progress-step-3"></div>
         </div>
 
-        <!-- Step 3 is currently a placeholder for the final questions. -->
-        <div
-          v-if="currentStep === 3"
-          class="assessment-form"
-        >
-          <h2>Step 3</h2>
-          <p>The final assessment questions will go here.</p>
-        </div>
-
-        <!-- Keep the supporting image beside the assessment form. -->
-        <div class="myspace-image-card">
-          <div class="myspace-image-text">
-            <strong>Small spaces matter</strong>
-            <p>Local biodiversity can support your community.</p>
-          </div>
-        </div>
-
+        <small>Garden image</small>
       </div>
 
-    </main>
+      <!-- Short note that used to sit on the separate image card. -->
+      <div class="myspace-image-text">
+        <strong>Small spaces matter.</strong>
+        <p>Even a balcony can support local biodiversity.</p>
+      </div>
 
-  </div>
+      <!-- "Your impact" used to live in the sidebar. Show it here now
+           since this page does not have a sidebar anymore. -->
+      <div class="impact-box floating-impact">
+        <strong>Your impact</strong>
+        <h3>0</h3>
+        <p>Actions completed</p>
+        <p>Prototype</p>
+      </div>
+
+    </div>
+  </section>
 </template>

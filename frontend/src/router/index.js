@@ -6,6 +6,7 @@ import LocalContextView from '../views/LocalContextView.vue'
 import AreaResultView from '../views/AreaResultView.vue'
 import PlantingIdeasView from '../views/PlantingIdeasView.vue'
 import ResourcesView from '../views/ResourcesView.vue'
+import AboutView from '../views/AboutView.vue'
 
 const routes = [
   {
@@ -37,6 +38,13 @@ const routes = [
     path: '/resources',
     name: 'Resources',
     component: ResourcesView
+  },
+  {
+    // The About page itself is not built yet, just routed to a
+    // placeholder for now so the header link is not dead.
+    path: '/about',
+    name: 'About',
+    component: AboutView
   }
 ]
 
