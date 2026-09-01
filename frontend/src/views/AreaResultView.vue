@@ -1,42 +1,53 @@
 <script setup>
+// This page shows the local biodiversity results for the postcode selected by the user.
+// It gets species data from the FastAPI backend and shows different states based on the result.
+
 import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import AppSidebar from '../components/AppSidebar.vue'
 
 const route = useRoute()
 
-// Get the postcode from the URL.
+// Read the postcode from the current URL.
 const postcode = ref(route.params.postcode)
 
-// Store species returned by FastAPI.
+// Store the species returned by the FastAPI backend.
 const species = ref([])
 
-// Page states.
+// Store the loading and error states for this page.
 const loading = ref(true)
 const errorMessage = ref('')
 
-// Load locally relevant species from the backend.
+// Request locally relevant species from the backend.
 const loadLocalSpecies = async () => {
   try {
     const response = await fetch(
       `http://127.0.0.1:8000/local-species/${postcode.value}`
     )
 
+    // I think the page should treat an unsuccessful response as an error
+    // instead of trying to display incomplete data.
     if (!response.ok) {
       throw new Error('Failed to load local species')
     }
 
     const data = await response.json()
 
+    // Save the species from the JSON response so the template can display them.
     species.value = data.species
   } catch (error) {
     console.error(error)
+
+    // I think showing a clear message is better than leaving the result area empty
+    // when the backend cannot return the local biodiversity data.
     errorMessage.value = 'Unable to load local biodiversity data.'
   } finally {
+    // Stop the loading state whether the request succeeds or fails.
     loading.value = false
   }
 }
 
+// Load the local biodiversity data when this page first opens.
 onMounted(() => {
   loadLocalSpecies()
 })
@@ -45,11 +56,12 @@ onMounted(() => {
 <template>
   <div class="page-layout">
 
+    <!-- Reuse the main sidebar for navigation. -->
     <AppSidebar />
 
     <main class="page-content">
 
-      <!-- Area heading -->
+      <!-- Show the postcode and introduce the local biodiversity result. -->
       <div class="area-result-heading">
 
         <RouterLink class="back-area-link" to="/explore">
@@ -66,12 +78,13 @@ onMounted(() => {
 
       </div>
 
-      <!-- Area data summary -->
+      <!-- Give the user a quick summary of what information is currently available. -->
       <section class="area-summary">
 
         <div class="summary-item">
           <span>Species evidence</span>
 
+          <!-- Species evidence is available when the backend returns at least one species. -->
           <strong v-if="species.length > 0">
             Available
           </strong>
@@ -98,7 +111,7 @@ onMounted(() => {
 
       </section>
 
-      <!-- Loading state -->
+      <!-- Show a simple loading state while waiting for the API response. -->
       <section
         v-if="loading"
         class="result-details"
@@ -111,7 +124,7 @@ onMounted(() => {
           </p>
         </div>
 
-        <!-- Keep original vegetation layout -->
+        <!-- Keep the current prototype vegetation layout while species are loading. -->
         <div class="vegetation-card">
 
           <h2>Vegetation context</h2>
@@ -147,7 +160,7 @@ onMounted(() => {
         </div>
       </section>
 
-      <!-- Error state -->
+      <!-- Show an error state if the API request cannot be completed. -->
       <section
         v-else-if="errorMessage"
         class="result-details"
@@ -161,6 +174,7 @@ onMounted(() => {
             Groups spotted in local records
           </p>
 
+          <!-- I think a clear error message is more useful than a blank result card. -->
           <div class="insufficient-species-message">
             <strong>Unable to load local data</strong>
 
@@ -171,7 +185,7 @@ onMounted(() => {
 
         </div>
 
-        <!-- Keep original vegetation layout -->
+        <!-- Keep the current prototype vegetation layout if the species request fails. -->
         <div class="vegetation-card">
 
           <h2>Vegetation context</h2>
@@ -208,13 +222,13 @@ onMounted(() => {
 
       </section>
 
-      <!-- Main results -->
+      <!-- Show the main result layout after the API request is complete. -->
       <section
         v-else
         class="result-details"
       >
 
-        <!-- Wildlife / species card -->
+        <!-- Display locally relevant species returned from the database through FastAPI. -->
         <div class="wildlife-card">
 
           <h2>What lives here?</h2>
@@ -223,7 +237,7 @@ onMounted(() => {
             Groups spotted in local records
           </p>
 
-          <!-- Database species -->
+          <!-- Create one visual item for each species returned by the API. -->
           <div
             v-if="species.length > 0"
             class="wildlife-groups"
@@ -235,6 +249,7 @@ onMounted(() => {
               class="wildlife-item"
             >
 
+              <!-- Alternate the circle style so neighbouring species are easier to separate. -->
               <div
                 :class="[
                   'wildlife-circle',
@@ -260,7 +275,7 @@ onMounted(() => {
 
           </div>
 
-          <!-- Insufficient data -->
+          <!-- I think users should get an honest fallback message when this postcode has no species data. -->
           <div
             v-else
             class="insufficient-species-message"
@@ -277,7 +292,7 @@ onMounted(() => {
 
         </div>
 
-        <!-- Original vegetation context -->
+        <!-- This vegetation section is still using the current prototype content. -->
         <div class="vegetation-card">
 
           <h2>Vegetation context</h2>

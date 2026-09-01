@@ -1,15 +1,19 @@
 <script setup>
+// This page presents the current Planting Ideas interface with native plant examples.
+// It currently focuses on the page layout and will support more dynamic recommendations later.
+
 import AppSidebar from '../components/AppSidebar.vue'
 </script>
 
 <template>
   <div class="page-layout">
 
+    <!-- Reuse the main sidebar for navigation. -->
     <AppSidebar />
 
     <main class="page-content">
 
-      <!-- Page heading -->
+      <!-- Introduce the Planting Ideas page and its purpose. -->
       <div class="planting-top">
 
         <div class="planting-heading">
@@ -21,11 +25,12 @@ import AppSidebar from '../components/AppSidebar.vue'
           </p>
         </div>
 
+        <!-- Decorative banner area used in the current page design. -->
         <div class="planting-banner"></div>
 
       </div>
 
-      <!-- Plant filters -->
+      <!-- Show the plant categories available in the current interface. -->
       <div class="plant-filters">
         <button class="filter-active">All plants</button>
         <button>Flowering plants</button>
@@ -33,9 +38,10 @@ import AppSidebar from '../components/AppSidebar.vue'
         <button>Groundcovers</button>
       </div>
 
-      <!-- Plant cards -->
+      <!-- Display example plant cards in the current prototype. -->
       <div class="plant-cards">
 
+        <!-- Common Correa plant card. -->
         <div class="plant-card">
           <div class="plant-card-image green-image"></div>
 
@@ -53,6 +59,7 @@ import AppSidebar from '../components/AppSidebar.vue'
           </div>
         </div>
 
+        <!-- Golden Wattle plant card. -->
         <div class="plant-card">
           <div class="plant-card-image green-image"></div>
 
@@ -70,6 +77,7 @@ import AppSidebar from '../components/AppSidebar.vue'
           </div>
         </div>
 
+        <!-- Bottlebrush plant card. -->
         <div class="plant-card">
           <div class="plant-card-image pink-image"></div>
 
@@ -87,6 +95,7 @@ import AppSidebar from '../components/AppSidebar.vue'
           </div>
         </div>
 
+        <!-- Lomandra plant card. -->
         <div class="plant-card">
           <div class="plant-card-image green-image"></div>
 
@@ -106,7 +115,7 @@ import AppSidebar from '../components/AppSidebar.vue'
 
       </div>
 
-      <!-- Bottom action -->
+      <!-- Encourage users to complete My Space before getting more personalised guidance. -->
       <div class="planting-action">
 
         <div>
@@ -116,6 +125,7 @@ import AppSidebar from '../components/AppSidebar.vue'
           </p>
         </div>
 
+        <!-- I think this action will be more useful once it is connected to the planning flow. -->
         <button type="button">
           Create my plan
         </button>
