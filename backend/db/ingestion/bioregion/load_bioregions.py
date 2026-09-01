@@ -12,6 +12,7 @@ import re
 import subprocess
 import sys
 from pathlib import Path
+import geopandas as gpd
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
@@ -48,18 +49,15 @@ def shapefile_to_geojson(path: Path) -> dict:
                if not path.with_suffix(ext).is_file()]
     if missing:
         raise FileNotFoundError("missing required shapefile components: " + ", ".join(missing))
-    completed = subprocess.run(
-        [
-            os.getenv("OGR2OGR", "ogr2ogr"), "-f", "GeoJSON", "/vsistdout/",
-            str(path), "-t_srs", "EPSG:4326", "-select", "BIOREGCODE,BIOREGION",
-        ],
-        text=True,
-        capture_output=True,
-        check=False,
-    )
-    if completed.returncode:
-        raise RuntimeError(completed.stderr.strip() or "ogr2ogr conversion failed")
-    return json.loads(completed.stdout)
+
+    try:
+        gdf = gpd.read_file(path)
+        gdf = gdf.to_crs(epsg=4326)
+        gdf = gdf[["BIOREGCODE", "BIOREGION", "geometry"]]
+    except Exception as error:
+        raise RuntimeError(f"shapefile conversion failed: {error}") from error
+
+    return json.loads(gdf.to_json())
 
 
 def _coordinate_pairs(value: object):

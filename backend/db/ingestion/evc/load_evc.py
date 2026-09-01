@@ -359,8 +359,10 @@ def run_dataset(
     received = 0
     repaired: set[str] = set()
     all_relationships: list[tuple[str, str, str, str, object]] = []
-    try:
-        for index, (postcode, bbox) in enumerate(postcodes, start=1):
+    skipped: list[tuple[str, str]] = []  # (postcode, reason)
+
+    for index, (postcode, bbox) in enumerate(postcodes, start=1):
+        try:
             path = fetch_postcode(
                 year, postcode, bbox, args.cache_dir,
                 refresh=args.refresh, offline=args.offline,
@@ -375,28 +377,26 @@ def run_dataset(
             )
             LOG.info("EVC %s postcode %s (%s/%s): %s relationships", year, postcode,
                      index, len(postcodes), len(relationships))
-        class_count, relationship_count = write_results(
-            config, source_id, year, [row[0] for row in postcodes], all_relationships
-        )
-        no_intersection = len(postcodes) - len({row[0] for row in all_relationships})
-        finish_data_load(
-            config, load_id, status="complete", received=received,
-            accepted=received, rejected=0,
-            notes=(f"Scoped EVC {year} load: {class_count} source classes stored, "
-                   f"{relationship_count} postcode relationships, {no_intersection} selected "
-                   f"postcodes without mapped intersection, {len(repaired)} unique source "
-                   "features repaired with ST_MakeValid; areas calculated in EPSG:3577"),
-        )
-        LOG.info("EVC %s complete: classes=%s relationships=%s no_intersection=%s repairs=%s",
-                 year, class_count, relationship_count, no_intersection, len(repaired))
-    except Exception as error:
-        LOG.exception("EVC %s load %s failed", year, load_id)
-        finish_data_load(
-            config, load_id, status="failed", received=received or None,
-            accepted=0 if received else None, rejected=received or None,
-            notes=f"Failed: {error}",
-        )
-        raise
+        except Exception as error:
+            LOG.warning("EVC %s postcode %s (%s/%s) skipped: %s", year, postcode,
+                        index, len(postcodes), error)
+            skipped.append((postcode, str(error)))
+
+    class_count, relationship_count = write_results(
+        config, source_id, year, [row[0] for row in postcodes], all_relationships
+    )
+    no_intersection = len(postcodes) - len({row[0] for row in all_relationships})
+    finish_data_load(
+        config, load_id, status="complete" if not skipped else "complete_with_skips",
+        received=received, accepted=received, rejected=len(skipped),
+        notes=(f"Scoped EVC {year} load: {class_count} source classes stored, "
+               f"{relationship_count} postcode relationships, {no_intersection} selected "
+               f"postcodes without mapped intersection, {len(repaired)} unique source "
+               f"features repaired with ST_MakeValid; {len(skipped)} postcodes skipped: "
+               f"{', '.join(p for p, _ in skipped) or 'none'}"),
+    )
+    LOG.info("EVC %s complete: classes=%s relationships=%s no_intersection=%s repairs=%s skipped=%s",
+             year, class_count, relationship_count, no_intersection, len(repaired), len(skipped))
 
 
 def parse_args() -> argparse.Namespace:
