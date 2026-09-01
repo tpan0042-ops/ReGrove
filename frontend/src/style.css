@@ -222,7 +222,6 @@ button {
 
 .app-sidebar {
   width: 190px;
-  min-height: 100vh;
   background-color: #0f4b27;
   color: white;
   padding: 25px 18px;
@@ -284,7 +283,7 @@ button {
 
 .page-layout {
   display: flex;
-  min-height: 100vh;
+  min-height: calc(100vh - 80px);
 }
 
 .page-content {
@@ -760,4 +759,419 @@ button {
   color: #8a9185;
   font-size: 10px;
   margin: 25px 0 0;
+}
+
+/* Planting Ideas page */
+
+.planting-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 30px;
+  margin-bottom: 15px;
+}
+
+.planting-heading h1 {
+  margin: 0 0 5px;
+  font-size: 32px;
+}
+
+.planting-heading h3 {
+  margin: 0 0 7px;
+  font-size: 16px;
+}
+
+.planting-heading p {
+  margin: 0;
+  color: #667263;
+  font-size: 12px;
+}
+
+.planting-banner {
+  width: 300px;
+  height: 90px;
+  background-color: #e5a3b3;
+  border-radius: 12px;
+}
+
+
+/* Filter buttons */
+
+.plant-filters {
+  display: flex;
+  gap: 14px;
+  margin-top: 5px;
+  margin-bottom: 25px;
+}
+
+.plant-filters button {
+  background-color: white;
+  color: #667263;
+  border: 1px solid #dddcca;
+  border-radius: 18px;
+  padding: 8px 18px;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.plant-filters .filter-active {
+  background-color: #dfecca;
+  color: #2d5f35;
+  border: none;
+}
+
+
+/* Plant cards */
+
+.plant-cards {
+  display: flex;
+  gap: 20px;
+}
+
+.plant-card {
+  flex: 1;
+  background-color: white;
+  border: 1px solid #dddcca;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.plant-card-image {
+  height: 150px;
+}
+
+.green-image {
+  background-color: #75a34d;
+}
+
+.pink-image {
+  background-color: #e5a3b3;
+}
+
+.plant-card-content {
+  padding: 16px;
+}
+
+.plant-card-content h3 {
+  margin: 0 0 5px;
+  font-size: 14px;
+}
+
+.plant-type {
+  margin: 0 0 15px;
+  color: #8a9185;
+  font-size: 10px;
+}
+
+.plant-tag {
+  display: inline-block;
+  background-color: #eef3df;
+  color: #2d5f35;
+  border-radius: 14px;
+  padding: 6px 14px;
+  font-size: 10px;
+  margin-bottom: 18px;
+}
+
+.plant-info {
+  color: #8a9185;
+  font-size: 10px;
+  line-height: 1.8;
+}
+
+
+/* Bottom action */
+
+.planting-action {
+  margin-top: 28px;
+  background-color: #dfecca;
+  border-radius: 10px;
+  padding: 20px 25px;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.planting-action h3 {
+  margin: 0 0 6px;
+  font-size: 15px;
+}
+
+.planting-action p {
+  margin: 0;
+  color: #667263;
+  font-size: 11px;
+}
+
+.planting-action button {
+  background-color: #174726;
+  color: white;
+  border: none;
+  border-radius: 7px;
+  padding: 11px 25px;
+  cursor: pointer;
+}
+
+/* Resources page */
+
+.resources-top {
+  display: flex;
+  gap: 28px;
+  align-items: flex-start;
+}
+
+.resources-left {
+  flex: 1;
+}
+
+.resources-right {
+  width: 300px;
+}
+
+
+/* Heading */
+
+.resources-heading {
+  margin-bottom: 28px;
+}
+
+.resources-heading h1 {
+  margin: 0 0 4px;
+  font-size: 30px;
+}
+
+.resources-heading h3 {
+  margin: 0 0 6px;
+  font-size: 13px;
+}
+
+.resources-heading p {
+  margin: 0;
+  color: #667263;
+  font-size: 12px;
+}
+
+
+/* Local biodiversity card */
+
+.context-card {
+  background-color: white;
+  border: 1px solid #dddcca;
+  border-radius: 10px;
+  padding: 20px;
+}
+
+.context-card h2 {
+  margin: 0 0 18px;
+  font-size: 16px;
+}
+
+.context-highlight {
+  background-color: #e3efd0;
+  border-radius: 8px;
+  padding: 16px 18px;
+}
+
+.context-highlight strong {
+  font-size: 12px;
+}
+
+.context-highlight p {
+  margin: 12px 0 0;
+  color: #667263;
+  font-size: 10px;
+  line-height: 1.6;
+  max-width: 390px;
+}
+
+.data-source-link {
+  margin: 16px 0 0 15px;
+  color: #2d5f35;
+  font-size: 9px;
+  font-weight: bold;
+}
+
+
+/* Right side */
+
+.garden-placeholder {
+  height: 155px;
+  background-color: #dfecca;
+  border-radius: 10px;
+  padding: 14px;
+  font-size: 10px;
+  color: #2d5f35;
+}
+
+.important-card {
+  background-color: #f1e9c8;
+  border-radius: 10px;
+  padding: 16px;
+  margin-top: 18px;
+}
+
+.important-card strong {
+  font-size: 11px;
+}
+
+.important-card p {
+  margin: 10px 0 0;
+  color: #667263;
+  font-size: 9px;
+  line-height: 1.6;
+}
+
+
+/* Bottom action */
+
+.context-action-title {
+  font-size: 16px;
+  margin: 32px 0 12px;
+}
+
+.context-action {
+  background-color: white;
+  border: 1px solid #dddcca;
+  border-radius: 10px;
+  padding: 15px 18px;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.context-action span {
+  font-size: 9px;
+  color: #667263;
+}
+
+.context-action p {
+  margin: 5px 0 0;
+  font-size: 11px;
+  font-weight: bold;
+}
+
+.context-action button {
+  background-color: #174726;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 9px 18px;
+  font-size: 10px;
+  cursor: pointer;
+}
+
+/* Database-backed local species */
+
+.species-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 18px;
+}
+
+.species-result-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+
+  min-width: 0;
+  padding: 14px;
+
+  background-color: #f7f8f2;
+  border: 1px solid #e1e2d8;
+  border-radius: 9px;
+}
+
+.species-result-marker {
+  width: 42px;
+  height: 42px;
+  min-width: 42px;
+
+  border-radius: 50%;
+  background-color: #dce9c6;
+}
+
+.species-result-text {
+  min-width: 0;
+
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+
+  gap: 4px;
+}
+
+.species-result-text strong {
+  color: #2d5f35;
+  font-size: 12px;
+  line-height: 1.3;
+}
+
+.species-result-text span {
+  color: #667263;
+  font-size: 10px;
+  line-height: 1.3;
+}
+
+.species-result-text small {
+  display: inline-block;
+
+  margin-top: 3px;
+  padding: 4px 8px;
+
+  background-color: #eef3df;
+  border-radius: 10px;
+
+  color: #667263;
+  font-size: 9px;
+}
+
+.insufficient-species-message {
+  margin-top: 18px;
+  padding: 16px;
+
+  background-color: #f1e9c8;
+  border-radius: 8px;
+}
+
+.insufficient-species-message strong {
+  display: block;
+  margin-bottom: 7px;
+
+  color: #2d5f35;
+  font-size: 12px;
+}
+
+.insufficient-species-message p {
+  margin: 0;
+
+  color: #667263;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+/* Species text inside the original wildlife layout */
+
+.species-scientific-name {
+  display: block;
+  margin-top: 5px;
+  color: #7b8378;
+  font-size: 9px;
+  line-height: 1.3;
+}
+
+.species-native-status {
+  display: block;
+  width: fit-content;
+
+  margin: 6px auto 0;
+  padding: 3px 7px;
+
+  background-color: #eef3df;
+  border-radius: 10px;
+
+  color: #667263;
+  font-size: 8px;
 }
