@@ -43,6 +43,9 @@ const searchLocalArea = () => {
       alt="A garden path lined with native flowers and trees"
     />
 
+    <!-- Same light tint layer as the My Space page. -->
+    <div class="explore-page-tint"></div>
+
     <div class="explore-page-overlay">
 
       <div class="explore-layout">
