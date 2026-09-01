@@ -1,4 +1,7 @@
 <script setup>
+// This page lets the user search for a local area by suburb or postcode.
+// It then sends the user to the matching biodiversity result page.
+
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import AppSidebar from '../components/AppSidebar.vue'
@@ -8,21 +11,23 @@ const router = useRouter()
 // Store the suburb or postcode entered by the user.
 const searchArea = ref('')
 
-// Open the result page for the entered postcode.
+// Search the entered area and open its result page.
 const searchLocalArea = () => {
   const value = searchArea.value.trim()
 
+  // I think an empty search should not open a result page.
   if (!value) {
     return
   }
 
-  // If the user enters something like "Clayton 3168",
-  // use the postcode at the end.
+  // I think using the four-digit postcode is more reliable when the user
+  // enters something like "Clayton 3168".
   const postcodeMatch = value.match(/\b\d{4}\b/)
 
   if (postcodeMatch) {
     router.push(`/area/${postcodeMatch[0]}`)
   } else {
+    // If there is no postcode, keep the entered suburb text in the URL.
     router.push(`/area/${encodeURIComponent(value)}`)
   }
 }
@@ -31,12 +36,14 @@ const searchLocalArea = () => {
 <template>
   <div class="page-layout">
 
+    <!-- Reuse the main sidebar for navigation. -->
     <AppSidebar />
 
     <main class="page-content">
 
       <div class="explore-layout">
 
+        <!-- Main search section for the local area. -->
         <div class="explore-main">
           <h1>Explore Area</h1>
           <h3>Discover biodiversity in your local area</h3>
@@ -45,6 +52,7 @@ const searchLocalArea = () => {
             Search by suburb or postcode to explore open-data-backed local context.
           </p>
 
+          <!-- Users can search with the button or press Enter. -->
           <div class="area-search">
             <input
               type="text"
@@ -61,6 +69,7 @@ const searchLocalArea = () => {
             </button>
           </div>
 
+          <!-- Quick links for some example areas. -->
           <p class="popular-title">Popular searches</p>
 
           <div class="popular-searches">
@@ -77,6 +86,7 @@ const searchLocalArea = () => {
             </RouterLink>
           </div>
 
+          <!-- Short message used in the Explore Area design. -->
           <div class="explore-message">
             <h2>
               The more we know,<br>
@@ -85,6 +95,7 @@ const searchLocalArea = () => {
           </div>
         </div>
 
+        <!-- Show an illustrative Melbourne area map beside the search section. -->
         <div class="melbourne-card">
           <h3>Greater Melbourne</h3>
 
