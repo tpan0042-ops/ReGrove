@@ -4,7 +4,6 @@
 
 import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
-import AppSidebar from '../components/AppSidebar.vue'
 
 const route = useRoute()
 
@@ -54,12 +53,20 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="page-layout">
+  <!-- This page does not use AppSidebar anymore, same as My Space and
+       Explore Area. It is now a full background photo with the result
+       cards floating on top of it. -->
+  <section class="area-result-page">
+    <img
+      class="area-result-page-image"
+      src="../assets/postcode_ResultPage.png"
+      alt="A meadow of native wildflowers"
+    />
 
-    <!-- Reuse the main sidebar for navigation. -->
-    <AppSidebar />
+    <!-- Same light tint layer as the other full-photo pages. -->
+    <div class="area-result-page-tint"></div>
 
-    <main class="page-content">
+    <div class="area-result-page-overlay">
 
       <!-- Show the postcode and introduce the local biodiversity result. -->
       <div class="area-result-heading">
@@ -335,6 +342,15 @@ onMounted(() => {
 
       </section>
 
-    </main>
-  </div>
+      <!-- "Your impact" used to live in the sidebar. Show it here now
+           since this page does not have a sidebar anymore. -->
+      <div class="impact-box floating-impact">
+        <strong>Your impact</strong>
+        <h3>0</h3>
+        <p>Actions completed</p>
+        <p>Prototype</p>
+      </div>
+
+    </div>
+  </section>
 </template>
