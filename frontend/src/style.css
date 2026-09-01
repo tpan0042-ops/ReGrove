@@ -19,23 +19,28 @@ button {
 
 .app-header {
   background-color: white;
-  padding: 20px 60px;
+  height: 76px;
+  padding: 0 60px;
 }
 
 .header-inner {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  height: 100%;
 }
 
 .brand {
   display: flex;
   align-items: center;
+  height: 100%;
   text-decoration: none;
 }
 
 .brand-logo {
-  height: 46px;
+  /* Fill the full header height so the logo touches the top and bottom
+     of the header bar instead of looking small in the middle. */
+  height: 100%;
   width: auto;
   display: block;
 }
@@ -296,32 +301,97 @@ button {
   padding: 40px;
 }
 
+/* The My Space page no longer uses the sidebar, so it now shows a full
+   background photo with the heading, form and other pieces floating on
+   top of it. */
+.myspace-page {
+  position: relative;
+  min-height: 720px;
+  overflow: hidden;
+}
+
+.myspace-page-image {
+  position: absolute;
+  /* A few pixels bigger than the box on every side. The blur makes the
+     photo's own edge look soft/foggy, so this pushes that soft edge
+     outside the visible area, where .myspace-page's overflow: hidden
+     cuts it off. The header sits outside this element entirely, so it
+     is not touched by the blur either way. */
+  top: -10px;
+  left: -10px;
+  width: calc(100% + 20px);
+  height: calc(100% + 20px);
+  object-fit: cover;
+
+  /* This is the actual "hazy design photo" trick: a soft blur plus less
+     saturation. A plain darker filter still looks like a sharp photo,
+     this makes it look soft and muted like the design. Still just
+     built-in CSS filter functions, nothing fancy. */
+  filter: blur(2px) saturate(0.55) brightness(1.03);
+}
+
+/* A very light wash on top, just to even the tone out a bit more. */
+.myspace-page-tint {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(247, 244, 234, 0.2);
+}
+
+.myspace-page-overlay {
+  position: relative;
+  /* A bit taller than before so the bottom-left impact card has room
+     and does not overlap the bottom of the white form card. */
+  min-height: 720px;
+  padding: 40px 60px;
+}
+
+/* Shared column for the heading and the form card below it. */
+.myspace-column {
+  margin-left: 14%;
+  max-width: 530px;
+}
+
 .assessment-heading {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 30px;
+  text-align: center;
+  margin-bottom: 25px;
+  color: #1f4a28;
+  text-shadow: 0 1px 10px rgba(255, 255, 255, 0.55);
 }
 
 .assessment-heading h1 {
-  margin: 0 0 8px;
-  font-size: 32px;
+  margin: 0 0 4px;
+  font-size: 15px;
+  letter-spacing: 0.5px;
 }
 
 .assessment-heading p {
-  margin: 0 0 5px;
+  margin: 0;
+  font-size: 26px;
   font-weight: bold;
 }
 
-.assessment-heading small {
-  color: #667263;
+/* Step counter and progress bar now float in the top right corner. */
+.myspace-progress {
+  position: absolute;
+  top: 40px;
+  right: 160px;
+  text-align: right;
+  font-size: 12px;
+  color: #2d5f35;
 }
 
-.step-info {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-  font-size: 13px;
+.myspace-progress span {
+  display: block;
+  margin-bottom: 6px;
+}
+
+.myspace-progress small {
+  display: block;
+  margin-top: 6px;
+  color: #55684f;
 }
 
 .progress-line {
@@ -424,26 +494,15 @@ button {
 
 .assessment-body {
   display: flex;
-  gap: 30px;
-  align-items: flex-start;
+  justify-content: flex-start;
 }
 
-.myspace-image-card {
-  width: 360px;
-  min-height: 350px;
-
-  background-image: url('./assets/MySpace.png');
-  background-size: cover;
-  background-position: center;
-
-  border-radius: 12px;
-  padding: 25px;
-
-  display: flex;
-  align-items: flex-end;
-}
-
+/* The photo now covers the whole page, so this note floats in the
+   bottom right corner instead of sitting on its own small image card. */
 .myspace-image-text {
+  position: absolute;
+  right: 200px;
+  bottom: 190px;
   background-color: #174726;
   color: white;
   padding: 15px;
@@ -459,6 +518,46 @@ button {
   margin: 5px 0 0;
   font-size: 12px;
   color: white;
+}
+
+/* "Your impact" used to live in the sidebar. This page does not use the
+   sidebar anymore, so show it in the bottom left corner instead. */
+/* Position for the floating "Your impact" card. Used on pages that show
+   a full background photo instead of the sidebar. */
+.floating-impact {
+  position: absolute;
+  left: 45px;
+  bottom: 30px;
+}
+
+/* Explore Area page: full background photo like My Space, but left
+   sharp and bright instead of blurred/tinted, to match its design. */
+.explore-page {
+  position: relative;
+  min-height: 760px;
+  overflow: hidden;
+}
+
+.explore-page-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.explore-page-overlay {
+  position: relative;
+  min-height: 760px;
+  padding: 40px 60px;
+}
+
+/* Row that holds the popular search pills and the Explore Area button. */
+.popular-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .explore-layout {
@@ -571,11 +670,6 @@ button {
   background-size: cover;
   background-position: center;
   border-radius: 8px;
-}
-
-.melbourne-placeholder p {
-  color: #667263;
-  font-size: 13px;
 }
 
 .map-label {

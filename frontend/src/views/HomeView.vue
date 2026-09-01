@@ -1,6 +1,8 @@
 <template>
   <main>
     <!-- Main introduction area -->
+    <!-- I used the real garden photo here as the banner background instead
+         of the old text-and-card layout, to match the new homepage design. -->
     <section class="hero-banner">
       <img
         class="hero-banner-image"
@@ -19,6 +21,7 @@
     <!-- Iteration 1 features -->
     <section class="prototype-section">
       <div class="prototype-heading">
+        <!-- Small tree icon next to the heading, matches the design. -->
         <img class="tree-icon" src="../assets/small tree.png" alt="" aria-hidden="true" />
 
         <div>
