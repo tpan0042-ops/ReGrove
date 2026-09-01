@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Load DCCEEW IBRA 7.1 regions and derive postcode overlaps."""
+"""Load an official local VBIOREG100 SHP and derive postcode overlaps."""
 
 from __future__ import annotations
 
@@ -12,7 +12,6 @@ import re
 import subprocess
 import sys
 from pathlib import Path
-from urllib.parse import urlencode
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
@@ -27,64 +26,40 @@ from common import (  # noqa: E402
 )
 
 
-SERVICE_URL = (
-    "https://gis.environment.gov.au/gispubmap/rest/services/ogc_services/"
-    "IBRA7_Regions/FeatureServer/0"
+DATASET_URL = (
+    "https://discover.data.vic.gov.au/dataset/"
+    "victorian-bioregions-mapped-at-1-100000-version-3-0-may2004"
 )
-QUERY_URL = f"{SERVICE_URL}/query"
-EXPECTED_REGION_COUNT = 89
+EXPECTED_REGION_COUNT = 28
 SOURCE = {
-    "name": "DCCEEW IBRA 7.1 Regions",
-    "provider": (
-        "Australian Government Department of Climate Change, Energy, "
-        "the Environment and Water"
-    ),
-    "url": SERVICE_URL,
-    "licence": "Creative Commons Attribution 3.0 Australia (CC BY 3.0 AU)",
-    "version": "IBRA 7.1 (2025)",
+    "name": "DEECA Victorian Bioregions 1:100,000",
+    "provider": "Victorian Department of Energy, Environment and Climate Action",
+    "url": DATASET_URL,
+    "licence": "Creative Commons Attribution 4.0 International (CC BY 4.0)",
+    "version": "VBIOREG100 version 3.0 (May 2004)",
 }
-CODE_RE = re.compile(r"^[A-Z]{3}$")
+CODE_RE = re.compile(r"^[A-Za-z0-9]{2,10}$")
 
 
-def download_geojson(destination: Path, refresh: bool = False) -> Path:
-    if destination.exists() and not refresh:
-        LOG.info("Using cached IBRA response: %s", destination)
-        return destination
-    params = urlencode(
-        {
-            "where": "1=1",
-            "outFields": "REG_CODE_7,REG_NAME_7,HECTARES",
-            "returnGeometry": "true",
-            "outSR": "4326",
-            "f": "geojson",
-        }
-    )
-    destination.parent.mkdir(parents=True, exist_ok=True)
-    temporary = destination.with_suffix(destination.suffix + ".part")
-    LOG.info("Downloading DCCEEW IBRA 7.1 regions")
+def shapefile_to_geojson(path: Path) -> dict:
+    if path.suffix.casefold() != ".shp":
+        raise ValueError("Victorian Bioregion input must be the downloaded .shp file")
+    missing = [str(path.with_suffix(ext)) for ext in (".shp", ".dbf", ".shx", ".prj")
+               if not path.with_suffix(ext).is_file()]
+    if missing:
+        raise FileNotFoundError("missing required shapefile components: " + ", ".join(missing))
     completed = subprocess.run(
         [
-            os.getenv("CURL", "curl"),
-            "--fail",
-            "--location",
-            "--silent",
-            "--show-error",
-            "--user-agent",
-            "ReGrove-ingestion/1",
-            "--output",
-            str(temporary),
-            f"{QUERY_URL}?{params}",
+            os.getenv("OGR2OGR", "ogr2ogr"), "-f", "GeoJSON", "/vsistdout/",
+            str(path), "-t_srs", "EPSG:4326", "-select", "BIOREGCODE,BIOREGION",
         ],
         text=True,
         capture_output=True,
         check=False,
     )
     if completed.returncode:
-        temporary.unlink(missing_ok=True)
-        raise RuntimeError(completed.stderr.strip() or "curl download failed")
-    temporary.replace(destination)
-    LOG.info("Cached %s bytes at %s", destination.stat().st_size, destination)
-    return destination
+        raise RuntimeError(completed.stderr.strip() or "ogr2ogr conversion failed")
+    return json.loads(completed.stdout)
 
 
 def _coordinate_pairs(value: object):
@@ -98,8 +73,11 @@ def _coordinate_pairs(value: object):
             yield from _coordinate_pairs(item)
 
 
-def read_and_validate(path: Path, expected_count: int) -> list[tuple[str, str, dict]]:
-    document = json.loads(path.read_text(encoding="utf-8"))
+def read_and_validate(
+    source: Path | dict,
+    expected_count: int,
+) -> list[tuple[str, str, dict]]:
+    document = shapefile_to_geojson(source) if isinstance(source, Path) else source
     if document.get("type") != "FeatureCollection":
         raise ValueError("input must be a GeoJSON FeatureCollection")
     if document.get("exceededTransferLimit"):
@@ -110,30 +88,34 @@ def read_and_validate(path: Path, expected_count: int) -> list[tuple[str, str, d
     names: set[str] = set()
     for index, feature in enumerate(document.get("features", []), start=1):
         properties = feature.get("properties") or {}
-        code = str(properties.get("REG_CODE_7", "")).strip()
-        name = str(properties.get("REG_NAME_7", "")).strip()
+        code = str(properties.get("BIOREGCODE", "")).strip()
+        name = str(properties.get("BIOREGION", "")).strip()
         geometry = feature.get("geometry") or {}
         if not CODE_RE.fullmatch(code):
-            raise ValueError(f"feature {index} has invalid IBRA region code {code!r}")
+            raise ValueError(f"feature {index} has invalid Victorian Bioregion code {code!r}")
         if not name:
-            raise ValueError(f"IBRA region {code} has no name")
-        if code in codes:
-            raise ValueError(f"duplicate IBRA region code {code!r}")
-        if name in names:
-            raise ValueError(f"duplicate IBRA region name {name!r}")
+            raise ValueError(f"Victorian Bioregion {code} has no name")
         if geometry.get("type") not in {"Polygon", "MultiPolygon"}:
-            raise ValueError(f"IBRA region {code} is not a polygon geometry")
+            raise ValueError(f"Victorian Bioregion {code} is not polygon geometry")
         pairs = list(_coordinate_pairs(geometry.get("coordinates")))
         if not pairs:
-            raise ValueError(f"IBRA region {code} has empty geometry")
+            raise ValueError(f"Victorian Bioregion {code} has empty geometry")
         if any(not (65 <= x <= 175 and -60 <= y <= -5) for x, y in pairs):
-            raise ValueError(f"IBRA region {code} coordinates are not plausible EPSG:4326")
+            raise ValueError(
+                f"Victorian Bioregion {code} coordinates are not plausible EPSG:4326"
+            )
         codes.add(code)
         names.add(name)
         rows.append((code, name, geometry))
 
-    if len(rows) != expected_count:
-        raise ValueError(f"expected {expected_count} IBRA regions, received {len(rows)}")
+    pairs = {(code, name) for code, name, _ in rows}
+    if len(codes) != len(pairs) or len(names) != len(pairs):
+        raise ValueError("Victorian Bioregion code/name mapping is not one-to-one")
+    if len(pairs) != expected_count:
+        raise ValueError(
+            f"expected {expected_count} Victorian Bioregions, received {len(pairs)} "
+            f"across {len(rows)} polygon fragments"
+        )
     return rows
 
 
@@ -150,11 +132,13 @@ def load_rows(
     source_id: int,
     rows: list[tuple[str, str, dict]],
 ) -> tuple[int, int, int]:
+    region_count = len({(code, name) for code, name, _ in rows})
     sql = rf"""
 BEGIN;
 CREATE TEMP TABLE bioregion_stage (
-    region_code text PRIMARY KEY,
-    region_name text NOT NULL UNIQUE,
+    fragment_id bigint GENERATED BY DEFAULT AS IDENTITY PRIMARY KEY,
+    region_code text NOT NULL,
+    region_name text NOT NULL,
     geometry_json jsonb NOT NULL
 ) ON COMMIT DROP;
 \copy bioregion_stage (region_code, region_name, geometry_json) FROM STDIN WITH (FORMAT csv)
@@ -163,9 +147,11 @@ CREATE TEMP TABLE bioregion_stage (
 CREATE TEMP TABLE bioregion_clean ON COMMIT DROP AS
 SELECT region_code,
        region_name,
-       source_geometry,
+       ST_UnaryUnion(ST_Collect(source_geometry)) AS source_geometry,
        ST_Multi(
-           ST_CollectionExtract(ST_MakeValid(source_geometry), 3)
+           ST_CollectionExtract(
+               ST_MakeValid(ST_UnaryUnion(ST_Collect(source_geometry))), 3
+           )
        ) AS geometry
 FROM (
     SELECT region_code,
@@ -173,14 +159,15 @@ FROM (
            ST_SetSRID(ST_GeomFromGeoJSON(geometry_json::text), 4326)
                AS source_geometry
     FROM bioregion_stage
-) parsed
+        ) parsed
+GROUP BY region_code, region_name
 ;
 
 DO $$
 BEGIN
     IF EXISTS (
         SELECT 1 FROM bioregion_clean
-        WHERE region_code !~ '^[A-Z]{{3}}$'
+        WHERE region_code !~ '^[A-Za-z0-9]{{2,10}}$'
            OR region_name = ''
            OR geometry IS NULL
            OR ST_IsEmpty(geometry)
@@ -188,7 +175,7 @@ BEGIN
            OR GeometryType(geometry) <> 'MULTIPOLYGON'
            OR ST_SRID(geometry) <> 4326
     ) THEN
-        RAISE EXCEPTION 'IBRA staging validation failed';
+        RAISE EXCEPTION 'Victorian Bioregion staging validation failed';
     END IF;
     IF NOT EXISTS (SELECT 1 FROM postcode) THEN
         RAISE EXCEPTION 'postcode ingestion must run before bioregion ingestion';
@@ -204,7 +191,7 @@ ON CONFLICT (source_id, bioregion_name) DO UPDATE SET
 
 DO $$
 BEGIN
-    IF (SELECT count(*) FROM bioregion WHERE source_id = {source_id}) <> {len(rows)} THEN
+    IF (SELECT count(*) FROM bioregion WHERE source_id = {source_id}) <> {region_count} THEN
         RAISE EXCEPTION 'database/source region count differs from staged row count';
     END IF;
 END $$;
@@ -250,7 +237,7 @@ BEGIN
             SELECT 1 FROM postcode_bioregion_stage r WHERE r.postcode = p.postcode
         )
     ) THEN
-        RAISE EXCEPTION 'one or more postcodes have no positive-area IBRA intersection';
+        RAISE EXCEPTION 'one or more postcodes have no positive-area bioregion intersection';
     END IF;
 END $$;
 
@@ -279,14 +266,7 @@ COMMIT;
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--input", type=Path, help="cached EPSG:4326 DCCEEW GeoJSON")
-    parser.add_argument(
-        "--cache",
-        type=Path,
-        default=Path.home() / ".cache" / "regrove" / "ibra_7_1_regions.geojson",
-        help="download cache outside the repository",
-    )
-    parser.add_argument("--refresh", action="store_true", help="replace the cached API response")
+    parser.add_argument("--input", type=Path, required=True, help="official VBIOREG100 .shp")
     parser.add_argument(
         "--expected-count", type=int, default=EXPECTED_REGION_COUNT,
         help="version-specific row-count guard",
@@ -300,18 +280,18 @@ def main() -> int:
     configure_logging(args.verbose)
     config = DatabaseConfig.from_environment()
     source_id = register_source(config, SOURCE)
-    origin = args.input or args.cache
-    load_id = start_data_load(config, source_id, f"IBRA region load requested from {origin}")
+    load_id = start_data_load(
+        config, source_id, f"Victorian Bioregion load requested from {args.input.name}"
+    )
     received: int | None = None
     try:
-        path = args.input or download_geojson(args.cache, args.refresh)
-        rows = read_and_validate(path, args.expected_count)
+        rows = read_and_validate(args.input, args.expected_count)
         received = len(rows)
         accepted, relationship_count, repaired_count = load_rows(config, source_id, rows)
         finish_data_load(
             config, load_id, status="complete", received=received,
             accepted=accepted, rejected=0,
-            notes=(f"Loaded {accepted} IBRA 7.1 regions from {path}; repaired "
+            notes=(f"Loaded {accepted} Victorian Bioregions from {args.input.name}; repaired "
                    f"{repaired_count} invalid source geometries with ST_MakeValid; derived "
                    f"{relationship_count} positive-area postcode relationships in EPSG:3577"),
         )
@@ -321,7 +301,7 @@ def main() -> int:
         )
         return 0
     except Exception as error:
-        LOG.exception("IBRA region load %s failed", load_id)
+        LOG.exception("Victorian Bioregion load %s failed", load_id)
         finish_data_load(
             config, load_id, status="failed", received=received,
             accepted=0 if received is not None else None, rejected=received,

@@ -1,4 +1,4 @@
-"""Dependency-free checks for the IBRA source boundary."""
+"""Dependency-free checks for the Victorian Bioregion source boundary."""
 
 from __future__ import annotations
 
@@ -19,7 +19,7 @@ SPEC.loader.exec_module(MODULE)
 def feature(code: str, name: str = "Test Region", coordinates=None) -> dict:
     return {
         "type": "Feature",
-        "properties": {"REG_CODE_7": code, "REG_NAME_7": name, "HECTARES": 1.0},
+        "properties": {"BIOREGCODE": code, "BIOREGION": name, "HECTARES": 1.0},
         "geometry": {
             "type": "Polygon",
             "coordinates": coordinates
@@ -36,19 +36,24 @@ class BioregionValidationTests(unittest.TestCase):
                 json.dumps({"type": "FeatureCollection", "features": features}),
                 encoding="utf-8",
             )
-            return MODULE.read_and_validate(path, expected_count)
+            document = json.loads(path.read_text(encoding="utf-8"))
+            return MODULE.read_and_validate(document, expected_count)
 
-    def test_accepts_one_ibra_region(self):
+    def test_accepts_one_victorian_bioregion(self):
         rows = self.read([feature("TST")], 1)
         self.assertEqual(rows[0][:2], ("TST", "Test Region"))
 
-    def test_rejects_duplicate_codes(self):
-        with self.assertRaisesRegex(ValueError, "duplicate IBRA region code"):
-            self.read([feature("AAA", "Alpha"), feature("AAA", "Beta")], 2)
+    def test_accepts_fragments_for_one_region(self):
+        rows = self.read([feature("AAA", "Alpha"), feature("AAA", "Alpha")], 1)
+        self.assertEqual(len(rows), 2)
 
-    def test_rejects_duplicate_names(self):
-        with self.assertRaisesRegex(ValueError, "duplicate IBRA region name"):
-            self.read([feature("AAA"), feature("BBB")], 2)
+    def test_rejects_inconsistent_code_name_mapping(self):
+        with self.assertRaisesRegex(ValueError, "code/name mapping"):
+            self.read([feature("AAA", "Alpha"), feature("AAA", "Beta")], 1)
+
+    def test_rejects_inconsistent_name_code_mapping(self):
+        with self.assertRaisesRegex(ValueError, "code/name mapping"):
+            self.read([feature("AAA", "Alpha"), feature("BBB", "Alpha")], 2)
 
     def test_rejects_invalid_geometry_coordinates(self):
         with self.assertRaisesRegex(ValueError, "EPSG:4326"):
