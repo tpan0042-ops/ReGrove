@@ -3,7 +3,7 @@
     <div class="header-inner">
 
       <RouterLink class="brand" to="/">
-        ReGrove
+        <img class="brand-logo" src="../assets/ReGrove_icon.png" alt="ReGrove logo" />
       </RouterLink>
 
       <nav class="main-nav">
