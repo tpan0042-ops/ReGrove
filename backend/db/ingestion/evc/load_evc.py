@@ -10,6 +10,7 @@ import json
 import os
 import subprocess
 import sys
+import time
 from pathlib import Path
 from urllib.parse import urlencode
 
@@ -28,6 +29,8 @@ from common import (  # noqa: E402
 
 WFS_URL = "https://opendata.maps.vic.gov.au/geoserver/wfs"
 PAGE_SIZE = 5000
+DEFAULT_STATEMENT_TIMEOUT_SECONDS = 180
+MAX_STATEMENT_TIMEOUT_SECONDS = 3600
 DATASETS = {
     1750: {
         "type_name": "open-data-platform:nv1750_evcbcs",
@@ -56,18 +59,32 @@ PROPERTIES = "veg_code,x_evcname,evc_bcs_desc,evc_code,bioregion,bioregion_code,
 
 
 def curl_json(url: str) -> dict:
-    completed = subprocess.run(
-        [
-            os.getenv("CURL", "curl"), "--fail", "--location", "--silent",
-            "--show-error", "--user-agent", "ReGrove-ingestion/1", url,
-        ],
-        text=True,
-        capture_output=True,
-        check=False,
-    )
-    if completed.returncode:
-        raise RuntimeError(completed.stderr.strip() or "curl request failed")
-    return json.loads(completed.stdout)
+    """Fetch one WFS page with bounded retries and network timeouts."""
+    last_error = "curl request failed"
+    for attempt in range(3):
+        completed = subprocess.run(
+            [
+                os.getenv("CURL", "curl"), "--fail", "--location", "--silent",
+                "--show-error", "--connect-timeout", "30", "--max-time", "180",
+                "--user-agent", "ReGrove-ingestion/1", url,
+            ],
+            text=True,
+            capture_output=True,
+            check=False,
+        )
+        if completed.returncode == 0:
+            try:
+                return json.loads(completed.stdout)
+            except json.JSONDecodeError as error:
+                last_error = f"invalid JSON response: {error}"
+        else:
+            last_error = completed.stderr.strip() or "curl request failed"
+        if attempt < 2:
+            delay = 2 ** attempt
+            LOG.warning("WFS request failed (attempt %s/3); retrying in %ss: %s",
+                        attempt + 1, delay, last_error)
+            time.sleep(delay)
+    raise RuntimeError(last_error)
 
 
 def database_postcodes(
@@ -180,7 +197,11 @@ def _coordinate_pairs(value: object):
             yield from _coordinate_pairs(item)
 
 
-def read_and_validate(path: Path) -> list[tuple[str, str, str, str, dict]]:
+def read_and_validate(
+    path: Path,
+    *,
+    unclassified: list[str] | None = None,
+) -> list[tuple[str, str, str, str, dict]]:
     document = json.loads(path.read_text(encoding="utf-8"))
     if document.get("type") != "FeatureCollection":
         raise ValueError("input must be a GeoJSON FeatureCollection")
@@ -197,6 +218,14 @@ def read_and_validate(path: Path) -> list[tuple[str, str, str, str, dict]]:
         if not feature_id or feature_id in feature_ids:
             raise ValueError(f"feature {index} has missing/duplicate source id {feature_id!r}")
         if not code or not name:
+            if (not code and not name and not status and
+                    not str(properties.get("evc_code", "")).strip() and
+                    not str(properties.get("bioregion", "")).strip() and
+                    not str(properties.get("bioregion_code", "")).strip()):
+                if unclassified is not None:
+                    unclassified.append(feature_id)
+                feature_ids.add(feature_id)
+                continue
             raise ValueError(f"feature {feature_id} has missing veg_code/x_evcname")
         if code in metadata and metadata[code] != (name, status):
             raise ValueError(f"inconsistent name/status for regional EVC {code}")
@@ -221,13 +250,19 @@ def aggregate_postcode(
     config: DatabaseConfig,
     postcode: str,
     rows: list[tuple[str, str, str, str, dict]],
-) -> tuple[list[dict], set[str]]:
+    statement_timeout_seconds: int = DEFAULT_STATEMENT_TIMEOUT_SECONDS,
+) -> tuple[list[dict], set[str], set[str]]:
+    if not 1 <= statement_timeout_seconds <= MAX_STATEMENT_TIMEOUT_SECONDS:
+        raise ValueError(
+            f"statement timeout must be between 1 and {MAX_STATEMENT_TIMEOUT_SECONDS} seconds"
+        )
     csv_rows = [
         (feature_id, code, name, status, json.dumps(geometry, separators=(",", ":")))
         for feature_id, code, name, status, geometry in rows
     ]
     sql = rf"""
 BEGIN;
+SET LOCAL statement_timeout = '{statement_timeout_seconds}s';
 CREATE TEMP TABLE evc_stage (
     feature_id text PRIMARY KEY, evc_code text NOT NULL, evc_name text NOT NULL,
     conservation_status text, geometry_json jsonb NOT NULL
@@ -247,18 +282,29 @@ BEGIN
     IF EXISTS (
         SELECT 1 FROM evc_clean
         WHERE evc_code = '' OR evc_name = '' OR geometry IS NULL
-           OR ST_IsEmpty(geometry) OR NOT ST_IsValid(geometry)
-           OR GeometryType(geometry) <> 'MULTIPOLYGON' OR ST_SRID(geometry) <> 4326
+           OR ST_SRID(geometry) <> 4326
     ) THEN RAISE EXCEPTION 'EVC geometry/field validation failed'; END IF;
 END $$;
-WITH p AS (
+WITH evc_usable AS MATERIALIZED (
+    SELECT *, ST_CollectionExtract(
+        ST_MakeValid(ST_Transform(geometry, 3577)), 3
+    ) AS metric_geometry
+    FROM evc_clean
+    WHERE NOT ST_IsEmpty(geometry) AND ST_Area(geometry) > 0
+      AND ST_IsValid(geometry) AND GeometryType(geometry) = 'MULTIPOLYGON'
+), p AS MATERIALIZED (
     SELECT ST_Transform(geometry, 3577) AS geometry
     FROM postcode WHERE postcode = :'postcode'
 ), intersections AS (
     SELECT e.evc_code, e.evc_name, e.conservation_status, p.geometry AS postcode_geometry,
-           ST_Intersection(p.geometry, ST_Transform(e.geometry, 3577)) AS overlap_geometry
-    FROM evc_clean e CROSS JOIN p
-    WHERE ST_Intersects(e.geometry, ST_Transform(p.geometry, 4326))
+           ST_Intersection(p.geometry, e.metric_geometry) AS overlap_geometry
+    FROM evc_usable e CROSS JOIN p
+    WHERE e.geometry && ST_Transform(p.geometry, 4326)
+      AND ST_IsValid(e.metric_geometry)
+      AND NOT ST_IsEmpty(e.metric_geometry)
+      AND ST_Area(e.metric_geometry) > 0
+      AND GeometryType(e.metric_geometry) = 'MULTIPOLYGON'
+      AND ST_Intersects(e.geometry, ST_Transform(p.geometry, 4326))
 ), aggregated AS (
     SELECT evc_code, evc_name, conservation_status, postcode_geometry,
            sum(ST_Area(overlap_geometry)) AS overlap_area
@@ -276,13 +322,21 @@ SELECT json_build_object(
     ), '[]'::json),
     'repairs', COALESCE((
         SELECT json_agg(feature_id ORDER BY feature_id)
-        FROM evc_clean WHERE NOT ST_IsValid(source_geometry)
+        FROM evc_clean
+        WHERE NOT ST_IsValid(source_geometry)
+           OR NOT ST_IsValid(ST_Transform(geometry, 3577))
+    ), '[]'::json),
+    'unusable', COALESCE((
+        SELECT json_agg(feature_id ORDER BY feature_id)
+        FROM evc_clean
+        WHERE ST_IsEmpty(geometry) OR ST_Area(geometry) <= 0
+           OR NOT ST_IsValid(geometry) OR GeometryType(geometry) <> 'MULTIPOLYGON'
     ), '[]'::json)
 )::text;
 ROLLBACK;
 """
     result = json.loads(run_psql(config, sql, variables={"postcode": postcode}).splitlines()[-1])
-    return result["relationships"], set(result["repairs"])
+    return result["relationships"], set(result["repairs"]), set(result["unusable"])
 
 
 def write_results(
@@ -358,48 +412,64 @@ def run_dataset(
     )
     received = 0
     repaired: set[str] = set()
+    unusable: set[str] = set()
+    unclassified: set[str] = set()
     all_relationships: list[tuple[str, str, str, str, object]] = []
-    skipped: list[tuple[str, str]] = []  # (postcode, reason)
-
-    for index, (postcode, bbox) in enumerate(postcodes, start=1):
-        try:
+    try:
+        for index, (postcode, bbox) in enumerate(postcodes, start=1):
             path = fetch_postcode(
                 year, postcode, bbox, args.cache_dir,
                 refresh=args.refresh, offline=args.offline,
             )
-            rows = read_and_validate(path)
-            received += len(rows)
-            relationships, postcode_repairs = aggregate_postcode(config, postcode, rows)
+            postcode_unclassified: list[str] = []
+            rows = read_and_validate(path, unclassified=postcode_unclassified)
+            unclassified.update(postcode_unclassified)
+            received += len(rows) + len(postcode_unclassified)
+            relationships, postcode_repairs, postcode_unusable = aggregate_postcode(
+                config, postcode, rows, args.statement_timeout_seconds
+            )
             repaired.update(postcode_repairs)
+            unusable.update(postcode_unusable)
             all_relationships.extend(
                 (postcode, item["code"], item["name"], item["status"], item["overlap_percent"])
                 for item in relationships
             )
             LOG.info("EVC %s postcode %s (%s/%s): %s relationships", year, postcode,
                      index, len(postcodes), len(relationships))
-        except Exception as error:
-            LOG.warning("EVC %s postcode %s (%s/%s) skipped: %s", year, postcode,
-                        index, len(postcodes), error)
-            skipped.append((postcode, str(error)))
+        class_count, relationship_count = write_results(
+            config, source_id, year, [row[0] for row in postcodes], all_relationships
+        )
+        no_intersection = len(postcodes) - len({row[0] for row in all_relationships})
+        finish_data_load(
+            config, load_id, status="complete", received=received,
+            accepted=received, rejected=0,
+            notes=(f"Scoped EVC {year} load: {class_count} source classes stored, "
+                   f"{relationship_count} postcode relationships, {no_intersection} selected "
+                   f"postcodes without mapped intersection, {len(repaired)} unique source "
+                   f"features repaired with ST_MakeValid, {len(unusable)} unusable source "
+                   f"features excluded after repair, {len(unclassified)} explicitly "
+                   "unclassified source features excluded; areas calculated in EPSG:3577"),
+        )
+        LOG.info("EVC %s complete: classes=%s relationships=%s no_intersection=%s repairs=%s",
+                 year, class_count, relationship_count, no_intersection, len(repaired))
+    except (KeyboardInterrupt, SystemExit) as error:
+        finish_data_load(
+            config, load_id, status="interrupted", received=received or None,
+            accepted=None, rejected=None,
+            notes=f"Interrupted before completion: {type(error).__name__}",
+        )
+        raise
+    except Exception as error:
+        LOG.exception("EVC %s load %s failed", year, load_id)
+        finish_data_load(
+            config, load_id, status="failed", received=received or None,
+            accepted=0 if received else None, rejected=received or None,
+            notes=f"Failed: {error}",
+        )
+        raise
 
-    class_count, relationship_count = write_results(
-        config, source_id, year, [row[0] for row in postcodes], all_relationships
-    )
-    no_intersection = len(postcodes) - len({row[0] for row in all_relationships})
-    finish_data_load(
-        config, load_id, status="complete" if not skipped else "complete_with_skips",
-        received=received, accepted=received, rejected=len(skipped),
-        notes=(f"Scoped EVC {year} load: {class_count} source classes stored, "
-               f"{relationship_count} postcode relationships, {no_intersection} selected "
-               f"postcodes without mapped intersection, {len(repaired)} unique source "
-               f"features repaired with ST_MakeValid; {len(skipped)} postcodes skipped: "
-               f"{', '.join(p for p, _ in skipped) or 'none'}"),
-    )
-    LOG.info("EVC %s complete: classes=%s relationships=%s no_intersection=%s repairs=%s skipped=%s",
-             year, class_count, relationship_count, no_intersection, len(repaired), len(skipped))
 
-
-def parse_args() -> argparse.Namespace:
+def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     scope = parser.add_mutually_exclusive_group(required=True)
     scope.add_argument("--postcode", action="append", help="postcode to process; repeatable")
@@ -411,8 +481,19 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument("--offline", action="store_true", help="require existing cache files")
     parser.add_argument("--refresh", action="store_true", help="replace matching cache files")
+    parser.add_argument(
+        "--statement-timeout-seconds", type=int,
+        default=DEFAULT_STATEMENT_TIMEOUT_SECONDS,
+        help=(f"per-postcode PostgreSQL timeout (1-{MAX_STATEMENT_TIMEOUT_SECONDS}s; "
+              f"default {DEFAULT_STATEMENT_TIMEOUT_SECONDS})"),
+    )
     parser.add_argument("--verbose", action="store_true")
-    return parser.parse_args()
+    args = parser.parse_args(argv)
+    if not 1 <= args.statement_timeout_seconds <= MAX_STATEMENT_TIMEOUT_SECONDS:
+        parser.error(
+            f"--statement-timeout-seconds must be between 1 and {MAX_STATEMENT_TIMEOUT_SECONDS}"
+        )
+    return args
 
 
 def main() -> int:

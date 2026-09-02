@@ -6,7 +6,8 @@ WITH vicflora_source AS (
     SELECT source_id
     FROM source
     WHERE source_name = 'VicFlora taxonomy'
-    ORDER BY source_id DESC
+      AND version LIKE 'GraphQL API 1.0.0; accessed %'
+    ORDER BY version DESC, source_id DESC
     LIMIT 1
 ), plant_rows AS (
     SELECT p.plant_species_id, p.scientific_name, p.common_name, p.native_status,

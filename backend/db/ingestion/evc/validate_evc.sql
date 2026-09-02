@@ -6,11 +6,11 @@
 WITH current_evc_source AS (
     SELECT DISTINCT ON (source_name) source_id, source_name, version
     FROM source
-    WHERE source_name IN (
-        'DEECA NV1750 EVC with Bioregional Conservation Status',
-        'DEECA NV2005 EVC with Bioregional Conservation Status'
-    )
-    ORDER BY source_name, source_id DESC
+    WHERE (source_name = 'DEECA NV1750 EVC with Bioregional Conservation Status'
+           AND version LIKE 'DataVic WFS layer nv1750_evcbcs; accessed %')
+       OR (source_name = 'DEECA NV2005 EVC with Bioregional Conservation Status'
+           AND version LIKE 'DataVic WFS layer nv2005_evcbcs; accessed %')
+    ORDER BY source_name, version DESC, source_id DESC
 )
 SELECT
     context.postcode,
@@ -31,11 +31,11 @@ ORDER BY context.reference_year, context.overlap_percent DESC, e.evc_code;
 WITH current_evc_source AS (
     SELECT DISTINCT ON (source_name) source_id, source_name, version
     FROM source
-    WHERE source_name IN (
-        'DEECA NV1750 EVC with Bioregional Conservation Status',
-        'DEECA NV2005 EVC with Bioregional Conservation Status'
-    )
-    ORDER BY source_name, source_id DESC
+    WHERE (source_name = 'DEECA NV1750 EVC with Bioregional Conservation Status'
+           AND version LIKE 'DataVic WFS layer nv1750_evcbcs; accessed %')
+       OR (source_name = 'DEECA NV2005 EVC with Bioregional Conservation Status'
+           AND version LIKE 'DataVic WFS layer nv2005_evcbcs; accessed %')
+    ORDER BY source_name, version DESC, source_id DESC
 )
 SELECT
     context.postcode,
@@ -58,9 +58,7 @@ SELECT
     source.url,
     source.licence,
     source.version,
-    source.source_id = max(source.source_id) OVER (
-        PARTITION BY source.source_name
-    ) AS current_validation_source,
+    source.version LIKE 'DataVic WFS layer %' AS current_validation_source,
     load.started_at,
     load.completed_at,
     load.status,

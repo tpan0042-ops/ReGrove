@@ -6,7 +6,8 @@ WITH current_bioregion_source AS (
     SELECT source_id
     FROM source
     WHERE source_name = 'DEECA Victorian Bioregions 1:100,000'
-    ORDER BY source_id DESC
+      AND version LIKE 'VBIOREG100 version 3.0%'
+    ORDER BY version DESC, source_id DESC
     LIMIT 1
 )
 SELECT
@@ -38,7 +39,8 @@ WITH current_bioregion_source AS (
     SELECT source_id
     FROM source
     WHERE source_name = 'DEECA Victorian Bioregions 1:100,000'
-    ORDER BY source_id DESC
+      AND version LIKE 'VBIOREG100 version 3.0%'
+    ORDER BY version DESC, source_id DESC
     LIMIT 1
 )
 SELECT

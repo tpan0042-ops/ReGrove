@@ -45,14 +45,36 @@ def feature(
 
 
 class EvcValidationTests(unittest.TestCase):
+    def test_default_statement_timeout(self):
+        args = MODULE.parse_args(["--postcode", "3233"])
+        self.assertEqual(args.statement_timeout_seconds, 180)
+
+    def test_custom_statement_timeout(self):
+        args = MODULE.parse_args([
+            "--postcode", "3312",
+            "--statement-timeout-seconds", "600",
+        ])
+        self.assertEqual(args.statement_timeout_seconds, 600)
+
+    def test_statement_timeout_must_be_bounded_positive(self):
+        for value in ("0", "-1", "3601"):
+            with self.subTest(value=value), self.assertRaises(SystemExit):
+                MODULE.parse_args([
+                    "--postcode", "3312",
+                    "--statement-timeout-seconds", value,
+                ])
+
     def read(self, features: list[dict]):
+        return self.read_with_options(features)
+
+    def read_with_options(self, features: list[dict], **kwargs):
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / "source.geojson"
             path.write_text(
                 json.dumps({"type": "FeatureCollection", "features": features}),
                 encoding="utf-8",
             )
-            return MODULE.read_and_validate(path)
+            return MODULE.read_and_validate(path, **kwargs)
 
     def test_accepts_regional_evc_and_preserves_status(self):
         rows = self.read([feature("nv1750_evcbcs.1")])
@@ -70,6 +92,14 @@ class EvcValidationTests(unittest.TestCase):
     def test_rejects_missing_or_duplicate_source_ids(self):
         with self.assertRaisesRegex(ValueError, "missing/duplicate source id"):
             self.read([feature("duplicate"), feature("duplicate")])
+
+    def test_records_explicitly_unclassified_source_feature(self):
+        item = feature("nv1750_evcbcs.150132", code="", name="", status="")
+        item["properties"].update({"evc_code": " ", "bioregion": " ", "bioregion_code": " "})
+        unclassified = []
+        rows = self.read_with_options([item], unclassified=unclassified)
+        self.assertEqual(rows, [])
+        self.assertEqual(unclassified, ["nv1750_evcbcs.150132"])
 
     def test_rejects_missing_regional_code_or_name(self):
         with self.assertRaisesRegex(ValueError, "missing veg_code/x_evcname"):

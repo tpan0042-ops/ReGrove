@@ -55,7 +55,8 @@ class EvcIntegrationTests(unittest.TestCase):
                       SELECT DISTINCT ON (source_name) source_id
                       FROM source
                       WHERE source_name LIKE 'DEECA NV% EVC with Bioregional Conservation Status'
-                      ORDER BY source_name, source_id DESC
+                        AND version LIKE 'DataVic WFS layer nv%_evcbcs; accessed %'
+                      ORDER BY source_name, version DESC, source_id DESC
                   ) current_sources
               )
               AND reference_year IN (1750, 2005)
@@ -77,7 +78,8 @@ class EvcIntegrationTests(unittest.TestCase):
                       SELECT DISTINCT ON (source_name) source_id
                       FROM source
                       WHERE source_name LIKE 'DEECA NV% EVC with Bioregional Conservation Status'
-                      ORDER BY source_name, source_id DESC
+                        AND version LIKE 'DataVic WFS layer nv%_evcbcs; accessed %'
+                      ORDER BY source_name, version DESC, source_id DESC
                   ) current_sources
               )
               AND reference_year IN (1750, 2005)

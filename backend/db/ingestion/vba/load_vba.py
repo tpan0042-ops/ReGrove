@@ -185,10 +185,8 @@ def extract_bbox_features(path: Path, dataset: str, bbox: tuple[float, ...]) -> 
             "record_count": records, "first_date": first, "last_date": last,
             "version": versions.strip(), "geometry": geometry,
         })
-    if not rows:
-        raise ValueError("source has no features in the selected postcode bounding box")
     versions = {row["version"] for row in rows}
-    if len(versions) != 1:
+    if len(versions) > 1:
         raise ValueError(f"selected source rows contain multiple VERS_DATE values: {versions}")
     return rows
 
@@ -325,7 +323,12 @@ LEFT JOIN plant_species p
  AND EXISTS (
      SELECT 1 FROM plant_trait t JOIN source vs USING (source_id)
      WHERE t.plant_species_id = p.plant_species_id
-       AND vs.source_name = 'VicFlora taxonomy'
+       AND vs.source_id = (
+           SELECT source_id FROM source
+           WHERE source_name = 'VicFlora taxonomy'
+             AND version LIKE 'GraphQL API 1.0.0; accessed %'
+           ORDER BY version DESC, source_id DESC LIMIT 1
+       )
  );
 DELETE FROM plant_occurrence_summary
 WHERE source_id = {source_id}
@@ -393,11 +396,35 @@ def write_report(path: Path, dataset: str, taxa: list[dict]) -> None:
     temporary.replace(path)
 
 
+def loaded_postcodes(config: DatabaseConfig) -> list[str]:
+    return run_psql(
+        config,
+        "SELECT postcode FROM postcode WHERE postcode ~ '^3[0-9]{3}$' ORDER BY postcode;",
+    ).splitlines()
+
+
+def batches(values: list[str], size: int) -> list[list[str]]:
+    if size < 1:
+        raise ValueError("batch size must be positive")
+    return [values[start:start + size] for start in range(0, len(values), size)]
+
+
+def source_version_from_rows(rows: list[dict]) -> str | None:
+    """Return the single source VERS_DATE in a non-empty batch, if present."""
+    versions = {str(row["version"]).strip() for row in rows if str(row.get("version", "")).strip()}
+    if len(versions) > 1:
+        raise ValueError(f"selected source rows contain multiple VERS_DATE values: {versions}")
+    return next(iter(versions), None)
+
+
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--dataset", choices=sorted(DATASETS), required=True)
     parser.add_argument("--input", type=Path, required=True)
-    parser.add_argument("--postcode", action="append", required=True)
+    scope = parser.add_mutually_exclusive_group(required=True)
+    scope.add_argument("--postcode", action="append")
+    scope.add_argument("--all-postcodes", action="store_true")
+    parser.add_argument("--batch-size", type=int, default=10)
     parser.add_argument("--report", type=Path)
     parser.add_argument("--verbose", action="store_true")
     return parser.parse_args(argv)
@@ -413,36 +440,64 @@ def main(argv: list[str] | None = None) -> int:
     load_id = None
     try:
         metadata = inspect_shapefile(args.input, args.dataset)
-        bbox = postcode_bbox(config, args.postcode)
-        rows = extract_bbox_features(args.input, args.dataset, bbox)
-        version = str(rows[0]["version"])
-        source = {
-            "name": DATASETS[args.dataset]["source_name"], "provider": PROVIDER,
-            "url": DATASETS[args.dataset]["url"], "licence": LICENCE,
-            "version": f"VBA VERS_DATE {version}",
-        }
-        source_id = register_source(config, source)
-        load_id = start_data_load(
-            config, source_id,
-            f"Local official SHP {args.input.name}; accessed={date.today().isoformat()}; "
-            f"postcodes={','.join(args.postcode)}; "
-            "grid-intersection occurrence context; RECORDS is not abundance",
-        )
-        result = load_rows(config, args.dataset, source_id, args.postcode, rows)
-        write_report(report, args.dataset, result["taxa"])
-        accepted = int(result["accepted_features"])
-        finish_data_load(
-            config, load_id, status="complete", received=len(rows), accepted=accepted,
-            rejected=len(rows) - accepted,
-            notes=(f"source_features={metadata['feature_count']}; bbox_features={len(rows)}; "
-                   f"intersecting_features={result['intersecting_features']}; "
-                   f"distinct_intersecting_taxa={result['distinct_intersecting_taxa']}; "
-                   f"persisted_summaries={result['persisted_summaries']}; report={report}; "
-                   "full cell RECORDS assigned as area-level context without overlap weighting"),
-        )
-        counts = Counter(row["resolution_result"] for row in result["taxa"])
-        LOG.info("%s", json.dumps({**result, "taxa": None, "resolution_counts": counts}))
-        LOG.info("Taxon report: %s", report)
+        selected = loaded_postcodes(config) if args.all_postcodes else sorted(set(args.postcode or []))
+        if not selected:
+            raise ValueError("no loaded Victorian postcodes selected")
+        source_id = None
+        all_counts = Counter()
+        batch_list = batches(selected, args.batch_size)
+        pending_empty: list[tuple[int, list[str], list[dict]]] = []
+
+        def persist_batch(index: int, postcodes: list[str], rows: list[dict]) -> None:
+            nonlocal load_id
+            load_id = start_data_load(
+                config, source_id,
+                f"Local official SHP {args.input.name}; accessed={date.today().isoformat()}; "
+                f"batch={index}; postcodes={','.join(postcodes)}; "
+                "grid-intersection occurrence context; RECORDS is not abundance",
+            )
+            result = load_rows(config, args.dataset, source_id, postcodes, rows)
+            batch_report = report if len(batch_list) == 1 else report.with_name(
+                f"{report.stem}.batch-{index:04d}{report.suffix}"
+            )
+            write_report(batch_report, args.dataset, result["taxa"])
+            accepted = int(result["accepted_features"])
+            finish_data_load(
+                config, load_id, status="complete", received=len(rows), accepted=accepted,
+                rejected=len(rows) - accepted,
+                notes=(f"source_features={metadata['feature_count']}; bbox_features={len(rows)}; "
+                       f"intersecting_features={result['intersecting_features']}; "
+                       f"distinct_intersecting_taxa={result['distinct_intersecting_taxa']}; "
+                       f"persisted_summaries={result['persisted_summaries']}; report={batch_report}; "
+                       "full cell RECORDS assigned as area-level context without overlap weighting"),
+            )
+            all_counts.update(row["resolution_result"] for row in result["taxa"])
+            LOG.info("VBA %s batch %s/%s: %s postcodes, %s intersecting features",
+                     args.dataset, index, len(batch_list),
+                     len(postcodes), result["intersecting_features"])
+            load_id = None
+        for index, postcodes in enumerate(batch_list, 1):
+            bbox = postcode_bbox(config, postcodes)
+            rows = extract_bbox_features(args.input, args.dataset, bbox)
+            if source_id is None:
+                version = source_version_from_rows(rows)
+                if version is None:
+                    pending_empty.append((index, postcodes, rows))
+                    LOG.info("VBA %s batch %s/%s has no source rows; deferring audit until VERS_DATE is known",
+                             args.dataset, index, len(batch_list))
+                    continue
+                source_id = register_source(config, {
+                    "name": DATASETS[args.dataset]["source_name"], "provider": PROVIDER,
+                    "url": DATASETS[args.dataset]["url"], "licence": LICENCE,
+                    "version": f"VBA VERS_DATE {version}",
+                })
+                for pending_index, pending_postcodes, pending_rows in pending_empty:
+                    persist_batch(pending_index, pending_postcodes, pending_rows)
+                pending_empty.clear()
+            persist_batch(index, postcodes, rows)
+        if source_id is None:
+            LOG.info("No VBA source rows found; no SOURCE registered and no batches persisted")
+        LOG.info("Completed %s Victorian postcodes; resolution counts=%s", len(selected), dict(all_counts))
         return 0
     except Exception as exc:
         LOG.exception("VBA %s load failed", args.dataset)

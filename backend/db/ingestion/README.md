@@ -215,6 +215,18 @@ python3 backend/db/ingestion/evc/load_evc.py \
 python3 backend/db/ingestion/evc/load_evc.py --all-postcodes --period both
 ```
 
+Each postcode aggregation uses a bounded PostgreSQL statement timeout of 180
+seconds by default. Complex cached postcodes may request a longer, still
+bounded timeout explicitly; `--statement-timeout-seconds` accepts 1–3600
+seconds and never permits unlimited execution:
+
+```bash
+python3 backend/db/ingestion/evc/load_evc.py \
+  --postcode 3312 --period 2005 --offline \
+  --cache-dir /private/tmp/regrove-evc-statewide \
+  --statement-timeout-seconds 600
+```
+
 Responses are paged, cached by year and postcode under
 `~/.cache/regrove/evc/`, and written atomically. Use `--offline` to require an
 existing cache, or `--refresh` to replace it. Each period's database write is
@@ -258,8 +270,9 @@ psql -X -v ON_ERROR_STOP=1 -v postcode=3233 \
 
 The validation query returns no row when the real source has not been loaded;
 that must not be presented as a successful result. Its ecological detail and
-coverage sections use the newest registered version of each named EVC product,
-so historical source versions are not summed together. The provenance section
+coverage sections use the newest registered version matching the official
+DataVic WFS-layer version pattern for each EVC product; snapshot sources are
+excluded. Historical source versions are not summed together. The provenance section
 still lists every `SOURCE` version and every `DATA_LOAD` audit row.
 
 ## VicFlora plant taxonomy
@@ -400,6 +413,22 @@ The default reports are written outside the repository under
 `~/.cache/regrove/vba/`. Every run creates a `data_load` audit. Scoped reruns
 delete and rebuild only that source/postcode summary set, preventing duplicates
 without deleting unrelated occurrence data.
+
+For a statewide Victorian load, use the explicit whole-dataset SHP together
+with `--all-postcodes`. Processing is batched by postcode so progress and audit
+rows remain inspectable; `--batch-size` controls the number of postcodes in one
+batch (the default is 10):
+
+```bash
+python3 backend/db/ingestion/vba/load_vba.py \
+  --dataset fauna --all-postcodes --batch-size 25 \
+  --input /absolute/path/VBA_FAUNA_GRID_1M.shp
+```
+
+The flora command has the same interface. A statewide flora run should only be
+performed after its complete SCI_NAME universe has been reviewed and resolved
+through VicFlora; unresolved names remain in the report and are not silently
+loaded as plant species.
 
 Scientific interpretation is mandatory:
 

@@ -10,13 +10,15 @@ FROM plant_occurrence_summary o
 JOIN source s USING (source_id)
 WHERE o.postcode = :'postcode'
   AND s.source_name = 'Victorian Biodiversity Atlas flora - 1 minute grid summary'
+  AND s.version LIKE 'VBA VERS_DATE %'
 UNION ALL
 SELECT 'fauna', count(*), sum(record_count)::bigint,
        min(period_start), max(period_end)
 FROM fauna_occurrence_summary o
 JOIN source s USING (source_id)
 WHERE o.postcode = :'postcode'
-  AND s.source_name = 'Victorian Biodiversity Atlas fauna - 1 minute grid summary';
+  AND s.source_name = 'Victorian Biodiversity Atlas fauna - 1 minute grid summary'
+  AND s.version LIKE 'VBA VERS_DATE %';
 
 SELECT 'flora' AS dataset, p.scientific_name, p.common_name,
        o.record_count AS observation_record_count,
@@ -26,6 +28,7 @@ JOIN plant_species p USING (plant_species_id)
 JOIN source s USING (source_id)
 WHERE o.postcode = :'postcode'
   AND s.source_name = 'Victorian Biodiversity Atlas flora - 1 minute grid summary'
+  AND s.version LIKE 'VBA VERS_DATE %'
 UNION ALL
 SELECT 'fauna', f.scientific_name, f.common_name, o.record_count,
        o.period_start, o.period_end
@@ -34,6 +37,7 @@ JOIN fauna_species f USING (fauna_species_id)
 JOIN source s USING (source_id)
 WHERE o.postcode = :'postcode'
   AND s.source_name = 'Victorian Biodiversity Atlas fauna - 1 minute grid summary'
+  AND s.version LIKE 'VBA VERS_DATE %'
 ORDER BY observation_record_count DESC, scientific_name
 LIMIT 30;
 

@@ -50,6 +50,19 @@ def feature(
 
 
 class VbaLoaderTests(unittest.TestCase):
+    def test_source_version_waits_for_non_empty_batch(self):
+        self.assertIsNone(MODULE.source_version_from_rows([]))
+        self.assertEqual(
+            MODULE.source_version_from_rows([{"version": "2026051905"}]),
+            "2026051905",
+        )
+
+    def test_source_version_rejects_mixed_versions(self):
+        with self.assertRaisesRegex(ValueError, "multiple VERS_DATE"):
+            MODULE.source_version_from_rows([
+                {"version": "2026051905"}, {"version": "2026051906"},
+            ])
+
     def shapefile(self, directory: str, name: str = "source.shp") -> Path:
         path = Path(directory) / name
         for extension in (".shp", ".dbf", ".shx", ".prj"):

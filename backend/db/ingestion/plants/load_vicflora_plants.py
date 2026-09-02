@@ -130,7 +130,10 @@ def load_cache(
     *,
     refresh: bool,
     offline: bool,
+    batch_size: int = 100,
 ) -> dict[str, list[dict]]:
+    if batch_size < 1:
+        raise ValueError("batch_size must be positive")
     document: dict = {}
     if path.exists():
         document = json.loads(path.read_text(encoding="utf-8"))
@@ -140,8 +143,13 @@ def load_cache(
     missing = names if refresh else [name for name in names if name not in responses]
     if missing and offline:
         raise FileNotFoundError(f"offline cache is missing {len(missing)} plant names")
-    if missing:
-        responses.update(fetch_names(missing))
+    for start in range(0, len(missing), batch_size):
+        batch = missing[start:start + batch_size]
+        LOG.info(
+            "Resolving VicFlora names %s-%s of %s",
+            start + 1, start + len(batch), len(missing),
+        )
+        responses.update(fetch_names(batch))
         path.parent.mkdir(parents=True, exist_ok=True)
         temporary = path.with_suffix(path.suffix + ".part")
         temporary.write_text(
@@ -355,6 +363,7 @@ def run(args: argparse.Namespace) -> tuple[list[dict], int, int]:
     ))
     responses = load_cache(
         args.cache, unique_queries, refresh=args.refresh, offline=args.offline,
+        batch_size=args.batch_size,
     )
     results = resolve_rows(inputs, responses)
     write_report(args.report, results)
@@ -410,6 +419,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     )
     parser.add_argument("--refresh", action="store_true")
     parser.add_argument("--offline", action="store_true")
+    parser.add_argument("--batch-size", type=int, default=100)
     parser.add_argument("--verbose", action="store_true")
     return parser.parse_args(argv)
 
