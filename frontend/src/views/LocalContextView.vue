@@ -55,9 +55,15 @@ const searchLocalArea = () => {
           <h1>Explore Area</h1>
           <h3>Discover biodiversity in your local area</h3>
 
-          <p class="explore-description">
-            Search by suburb or postcode to explore open-data-backed local context.
-          </p>
+          <!-- Short message used in the Explore Area design. Sits right
+               under the heading, above the search bar, on a translucent
+               grey panel over the photo. -->
+          <div class="explore-message">
+            <h2>
+              The more we know,<br>
+              the more we can grow.
+            </h2>
+          </div>
 
           <!-- Users can search with the button or press Enter. -->
           <div class="area-search">
@@ -72,44 +78,27 @@ const searchLocalArea = () => {
               type="button"
               @click="searchLocalArea"
             >
-              Search
+              Explore
             </button>
           </div>
 
-          <!-- Quick links for some example areas, plus a bigger Explore
-               Area button that runs the same search. -->
+          <!-- Quick links for some example areas. The search bar above
+               already covers the "explore" action, so there is no
+               separate button here anymore. -->
           <p class="popular-title">Popular searches</p>
 
-          <div class="popular-row">
-            <div class="popular-searches">
-              <RouterLink to="/area/3168">
-                Clayton 3168
-              </RouterLink>
+          <div class="popular-searches">
+            <RouterLink to="/area/3168">
+              Clayton 3168
+            </RouterLink>
 
-              <RouterLink to="/area/3175">
-                Dandenong 3175
-              </RouterLink>
+            <RouterLink to="/area/3175">
+              Dandenong 3175
+            </RouterLink>
 
-              <RouterLink to="/area/3199">
-                Frankston 3199
-              </RouterLink>
-            </div>
-
-            <button
-              type="button"
-              class="next-button"
-              @click="searchLocalArea"
-            >
-              Explore Area
-            </button>
-          </div>
-
-          <!-- Short message used in the Explore Area design. -->
-          <div class="explore-message">
-            <h2>
-              The more we know,<br>
-              the more we can grow.
-            </h2>
+            <RouterLink to="/area/3199">
+              Frankston 3199
+            </RouterLink>
           </div>
         </div>
 
