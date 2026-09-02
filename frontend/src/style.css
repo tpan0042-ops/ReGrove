@@ -480,11 +480,13 @@ button {
 }
 
 .next-button {
+  display: inline-block;
   background-color: #1f5a30;
   color: white;
   border: none;
   border-radius: 7px;
   padding: 11px 24px;
+  text-decoration: none;
   cursor: pointer;
 }
 
@@ -756,149 +758,6 @@ button {
   font-size: 12px;
 }
 
-
-/* Summary information */
-
-.area-summary {
-  display: flex;
-  background-color: #e7efd7;
-  border-radius: 12px;
-  padding: 25px 28px;
-  gap: 25px;
-}
-
-.summary-item {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.summary-item span {
-  color: #667263;
-  font-size: 11px;
-}
-
-.summary-item strong {
-  color: #2d5f35;
-  font-size: 16px;
-}
-
-
-/* Result cards */
-
-.result-details {
-  display: flex;
-  gap: 25px;
-  margin-top: 28px;
-  align-items: stretch;
-}
-
-.wildlife-card,
-.vegetation-card {
-  flex: 1;
-  background-color: white;
-  border: 1px solid #dddcca;
-  border-radius: 12px;
-  padding: 25px;
-  min-height: 260px;
-}
-
-.wildlife-card h2,
-.vegetation-card h2 {
-  font-size: 16px;
-  margin: 0 0 7px;
-}
-
-
-/* Wildlife card */
-
-.wildlife-note {
-  margin: 0 0 26px;
-  color: #8a9185;
-  font-size: 10px;
-  text-transform: uppercase;
-}
-
-.wildlife-groups {
-  display: flex;
-  justify-content: space-between;
-  gap: 10px;
-}
-
-.wildlife-item {
-  flex: 1;
-  text-align: center;
-}
-
-.wildlife-circle {
-  width: 42px;
-  height: 42px;
-  border-radius: 50%;
-  margin: 0 auto 12px;
-}
-
-.circle-yellow {
-  background-color: #e8c33f;
-}
-
-.circle-green {
-  background-color: #dce9c6;
-}
-
-.wildlife-item strong {
-  font-size: 10px;
-  color: #526a50;
-}
-
-
-/* Vegetation card */
-
-.vegetation-card h2 {
-  margin-bottom: 24px;
-}
-
-.vegetation-row {
-  margin-bottom: 20px;
-}
-
-.vegetation-row span {
-  display: block;
-  color: #667263;
-  font-size: 11px;
-  margin-bottom: 7px;
-}
-
-.vegetation-bar {
-  width: 100%;
-  height: 5px;
-  background-color: #e5e5da;
-  border-radius: 5px;
-}
-
-.vegetation-fill {
-  height: 5px;
-  background-color: #2d6b3d;
-  border-radius: 5px;
-}
-
-.vegetation-fill-1 {
-  width: 38%;
-}
-
-.vegetation-fill-2 {
-  width: 31%;
-}
-
-.vegetation-fill-3 {
-  width: 24%;
-}
-
-.vegetation-note {
-  color: #8a9185;
-  font-size: 10px;
-  margin: 25px 0 0;
-}
 
 /* Planting Ideas page */
 
@@ -1267,50 +1126,44 @@ button {
   font-size: 9px;
 }
 
-.insufficient-species-message {
-  margin-top: 18px;
-  padding: 16px;
+/* Explore Area continued: historical vs current species presence,
+   shown below the main result summary. Card content is left blank
+   until this is wired up to real data. */
 
-  background-color: #f1e9c8;
-  border-radius: 8px;
+.species-timeline {
+  margin-top: 40px;
 }
 
-.insufficient-species-message strong {
-  display: block;
-  margin-bottom: 7px;
+.timeline-heading {
+  margin: 0 0 18px;
 
-  color: #2d5f35;
-  font-size: 12px;
+  color: #1f2d22;
+  font-size: 22px;
+  font-weight: 700;
 }
 
-.insufficient-species-message p {
-  margin: 0;
+.timeline-cards {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
 
-  color: #667263;
-  font-size: 11px;
-  line-height: 1.5;
+  margin-bottom: 36px;
 }
 
-/* Species text inside the original wildlife layout */
+.timeline-card {
+  min-height: 95px;
 
-.species-scientific-name {
-  display: block;
-  margin-top: 5px;
-  color: #7b8378;
-  font-size: 9px;
-  line-height: 1.3;
+  background-color: white;
+  border-radius: 14px;
+  box-shadow: 0 4px 14px rgba(40, 60, 40, 0.12);
 }
 
-.species-native-status {
-  display: block;
-  width: fit-content;
+.timeline-card-current {
+  background-color: #d7e6c4;
+  box-shadow: none;
+}
 
-  margin: 6px auto 0;
-  padding: 3px 7px;
-
-  background-color: #eef3df;
-  border-radius: 10px;
-
-  color: #667263;
-  font-size: 8px;
+.timeline-actions {
+  display: flex;
+  justify-content: flex-end;
 }
