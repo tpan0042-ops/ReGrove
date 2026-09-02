@@ -259,6 +259,62 @@ button {
   font-size: 14px;
 }
 
+/* Home page (and the shared header) on narrower screens. The header,
+   hero banner and section paddings above are all sized for desktop, so
+   this brings them down to something that fits a phone instead of
+   overflowing sideways - the hero wordmark in particular was spilling
+   off the right edge of the screen. */
+@media (max-width: 700px) {
+  .app-header {
+    height: auto;
+    padding: 14px 20px;
+  }
+
+  .header-inner {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+  }
+
+  .brand-logo {
+    height: 36px;
+  }
+
+  .main-nav {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px 16px;
+    font-size: 13px;
+  }
+
+  .hero-banner {
+    height: 220px;
+  }
+
+  .hero-banner-overlay {
+    padding: 0 20px;
+  }
+
+  .hero-wordmark {
+    font-size: 44px;
+  }
+
+  .hero-wordmark-underline {
+    width: 140px;
+  }
+
+  .prototype-section {
+    padding: 10px 20px 30px;
+  }
+
+  .data-source-section {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 18px 20px;
+  }
+}
+
 .app-sidebar {
   width: 190px;
   background-color: #0f4b27;
@@ -328,6 +384,15 @@ button {
 .page-content {
   flex: 1;
   padding: 40px;
+}
+
+/* The About page (and anything else using this generic wrapper) gets a
+   smaller side padding on a phone screen so text isn't pushed in by
+   40px on both sides. */
+@media (max-width: 700px) {
+  .page-content {
+    padding: 20px;
+  }
 }
 
 /* The My Space page no longer uses the sidebar, so it now shows a full
@@ -582,6 +647,50 @@ button {
   color: white;
 }
 
+/* My Space (assessment) page on narrower screens. The progress readout
+   and the "Small spaces matter" note are positioned with fixed offsets
+   that assume a wide desktop photo, so on a phone they come out of the
+   floating layout and stack in the normal page flow instead of
+   overlapping the form. */
+@media (max-width: 700px) {
+  .myspace-page-overlay {
+    padding: 24px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .myspace-column {
+    margin-left: 0;
+    max-width: 100%;
+  }
+
+  .myspace-progress {
+    position: static;
+    text-align: left;
+
+    /* Without the fixed top-right offset this now sits directly on the
+       photo, wherever that happens to land, so give it a light card
+       background instead of relying on the photo being pale there. */
+    background-color: rgba(255, 255, 255, 0.85);
+    padding: 10px 14px;
+    border-radius: 8px;
+  }
+
+  .myspace-image-text {
+    position: static;
+    max-width: 100%;
+  }
+
+  .space-options {
+    flex-wrap: wrap;
+  }
+
+  .space-option {
+    width: calc(50% - 8px);
+  }
+}
+
 /* "Your impact" used to live in the sidebar. This page does not use the
    sidebar anymore, so show it in the bottom left corner instead. */
 /* Position for the floating "Your impact" card. Used on pages that show
@@ -754,6 +863,31 @@ button {
 
 .melbourne-card small {
   color: #8a9185;
+}
+
+/* Explore Area page on narrower screens. The search column and the
+   Greater Melbourne card sit side by side on desktop, which is too
+   tight for a phone, so they stack instead. */
+@media (max-width: 700px) {
+  .explore-page-overlay {
+    padding: 24px 20px;
+  }
+
+  .explore-layout {
+    flex-direction: column;
+  }
+
+  .explore-main {
+    max-width: 100%;
+  }
+
+  .melbourne-card {
+    width: 100%;
+  }
+
+  .popular-searches {
+    flex-wrap: wrap;
+  }
 }
 
 /* Clayton area result page */
@@ -1232,4 +1366,18 @@ button {
 .timeline-actions {
   display: flex;
   justify-content: flex-end;
+}
+
+/* Area Result page on narrower screens: same padding fix as the other
+   full-photo pages, plus the historical/current species grid drops
+   from four columns to two so the cards stay readable on a phone. */
+@media (max-width: 700px) {
+  .area-result-page-overlay {
+    padding: 24px 20px;
+  }
+
+  .timeline-cards {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
 }
