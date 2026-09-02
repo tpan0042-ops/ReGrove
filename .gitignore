@@ -7,6 +7,8 @@ __pycache__/
 
 .env
 .DS_Store
+setup-env.ps1
+
 
 # Raw/downloaded spatial data and generated ingestion artefacts never belong in Git.
 VBA_flora/
