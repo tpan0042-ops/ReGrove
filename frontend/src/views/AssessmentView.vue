@@ -3,8 +3,11 @@
 // It shows the current step and uses AssessmentForm for the first set of questions.
 
 import { ref } from 'vue'
+import { useRouter } from 'vue-router'
 
 import AssessmentForm from '../components/AssessmentForm.vue'
+
+const router = useRouter()
 
 // Store the current assessment step.
 const currentStep = ref(1)
@@ -16,6 +19,12 @@ const nextStep = () => {
   if (currentStep.value < 3) {
     currentStep.value = currentStep.value + 1
   }
+}
+
+// Step 3 is the last step, so finishing it sends the user to Planting Ideas
+// instead of moving to another step.
+const goToPlanting = () => {
+  router.push('/planting')
 }
 </script>
 
@@ -60,15 +69,34 @@ const nextStep = () => {
           >
             <h2>Step 2</h2>
             <p>The next assessment questions will go here.</p>
+
+            <div class="form-actions">
+              <button
+                class="next-button"
+                @click="nextStep"
+              >
+                Next →
+              </button>
+            </div>
           </div>
 
-          <!-- Step 3 is currently a placeholder for the final questions. -->
+          <!-- Step 3 is currently a placeholder for the final questions.
+               Finishing this step sends the user to Planting Ideas. -->
           <div
             v-if="currentStep === 3"
             class="assessment-form"
           >
             <h2>Step 3</h2>
             <p>The final assessment questions will go here.</p>
+
+            <div class="form-actions">
+              <button
+                class="next-button"
+                @click="goToPlanting"
+              >
+                Finish →
+              </button>
+            </div>
           </div>
 
         </div>

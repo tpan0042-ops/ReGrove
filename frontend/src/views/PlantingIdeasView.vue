@@ -2,16 +2,40 @@
 // This page presents the current Planting Ideas interface with native plant examples.
 // It currently focuses on the page layout and will support more dynamic recommendations later.
 
-import AppSidebar from '../components/AppSidebar.vue'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
+
+// Send the user to the Local Insight page for a specific area.
+// There is no shared "last searched area" state yet, so this uses the
+// same Clayton 3168 example already shown elsewhere in the app (Explore
+// Area's popular searches, and the Local Insight mockup).
+const goToLocalInsight = () => {
+  router.push('/area/3168')
+}
+
+// Send the user on to My Plan, which will combine this page's plant
+// choices with the user's My Space profile.
+const goToMyPlan = () => {
+  router.push('/plan')
+}
 </script>
 
 <template>
-  <div class="page-layout">
+  <!-- This page does not use AppSidebar anymore, same as the other pages
+       that now show a full background photo. Reusing the same photo as
+       the area result page, since it matches this page's design too. -->
+  <section class="planting-page">
+    <img
+      class="planting-page-image"
+      src="../assets/postcode_ResultPage.png"
+      alt="A meadow of native wildflowers"
+    />
 
-    <!-- Reuse the main sidebar for navigation. -->
-    <AppSidebar />
+    <!-- Same light tint layer as the other full-photo pages. -->
+    <div class="planting-page-tint"></div>
 
-    <main class="page-content">
+    <div class="planting-page-overlay">
 
       <!-- Introduce the Planting Ideas page and its purpose. -->
       <div class="planting-top">
@@ -25,8 +49,14 @@ import AppSidebar from '../components/AppSidebar.vue'
           </p>
         </div>
 
-        <!-- Decorative banner area used in the current page design. -->
-        <div class="planting-banner"></div>
+        <!-- Move on to the Local Insight page for this area. -->
+        <button
+          type="button"
+          class="next-button"
+          @click="goToLocalInsight"
+        >
+          See local insight →
+        </button>
 
       </div>
 
@@ -125,14 +155,24 @@ import AppSidebar from '../components/AppSidebar.vue'
           </p>
         </div>
 
-        <!-- I think this action will be more useful once it is connected to the planning flow. -->
-        <button type="button">
+        <button
+          type="button"
+          @click="goToMyPlan"
+        >
           Create my plan
         </button>
 
       </div>
 
-    </main>
+      <!-- "Your impact" used to live in the sidebar. Show it here now
+           since this page does not have a sidebar anymore. -->
+      <div class="impact-box floating-impact">
+        <strong>Your impact</strong>
+        <h3>0</h3>
+        <p>Actions completed</p>
+        <p>Prototype</p>
+      </div>
 
-  </div>
+    </div>
+  </section>
 </template>

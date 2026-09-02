@@ -5,6 +5,7 @@ import AssessmentView from '../views/AssessmentView.vue'
 import LocalContextView from '../views/LocalContextView.vue'
 import AreaResultView from '../views/AreaResultView.vue'
 import PlantingIdeasView from '../views/PlantingIdeasView.vue'
+import SpacePlantingView from '../views/SpacePlantingView.vue'
 import ResourcesView from '../views/ResourcesView.vue'
 import AboutView from '../views/AboutView.vue'
 
@@ -33,6 +34,13 @@ const routes = [
     path: '/planting',
     name: 'PlantingIdeas',
     component: PlantingIdeasView
+  },
+  {
+    // Combines the My Space profile with the plants chosen on Planting
+    // Ideas into one plan. The page itself is just a placeholder for now.
+    path: '/plan',
+    name: 'MyPlan',
+    component: SpacePlantingView
   },
   {
     path: '/resources',

@@ -1,19 +1,27 @@
 <script setup>
-// This page shows the local biodiversity results for the postcode selected by the user.
-// It gets species data from the FastAPI backend and shows different states based on the result.
+// This page shows the local biodiversity context for the postcode (or
+// suburb text) selected by the user, matching the "Local Insight" design.
+//
+// It still requests species data from the FastAPI backend in the
+// background, same as before, so that data is ready once this page is
+// connected to a more detailed species view. The current design does not
+// render a species list yet, so loading/error states are not shown.
 
 import { ref, onMounted } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 
 const route = useRoute()
+const router = useRouter()
 
-// Read the postcode from the current URL.
+// Read the postcode (or suburb text) from the current URL.
 const postcode = ref(route.params.postcode)
 
-// Store the species returned by the FastAPI backend.
+// Store the species returned by the FastAPI backend. Kept for later use,
+// not rendered by the current design.
 const species = ref([])
 
-// Store the loading and error states for this page.
+// Store the loading and error states for this page. Also kept for later
+// use, not rendered by the current design.
 const loading = ref(true)
 const errorMessage = ref('')
 
@@ -32,16 +40,14 @@ const loadLocalSpecies = async () => {
 
     const data = await response.json()
 
-    // Save the species from the JSON response so the template can display them.
+    // Save the species from the JSON response for when this page's cards
+    // are connected to real species data.
     species.value = data.species
   } catch (error) {
     console.error(error)
 
-    // I think showing a clear message is better than leaving the result area empty
-    // when the backend cannot return the local biodiversity data.
     errorMessage.value = 'Unable to load local biodiversity data.'
   } finally {
-    // Stop the loading state whether the request succeeds or fails.
     loading.value = false
   }
 }
@@ -50,12 +56,16 @@ const loadLocalSpecies = async () => {
 onMounted(() => {
   loadLocalSpecies()
 })
+
+// Move on to the Planting Ideas page.
+const goToPlantingIdeas = () => {
+  router.push('/planting')
+}
 </script>
 
 <template>
-  <!-- This page does not use AppSidebar anymore, same as My Space and
-       Explore Area. It is now a full background photo with the result
-       cards floating on top of it. -->
+  <!-- This page keeps the same full background photo pattern as the
+       other main pages (My Space, Explore Area, Planting Ideas). -->
   <section class="area-result-page">
     <img
       class="area-result-page-image"
@@ -68,279 +78,89 @@ onMounted(() => {
 
     <div class="area-result-page-overlay">
 
-      <!-- Show the postcode and introduce the local biodiversity result. -->
-      <div class="area-result-heading">
+      <RouterLink class="back-area-link" to="/explore">
+        Back to Explore Area
+      </RouterLink>
 
-        <RouterLink class="back-area-link" to="/explore">
-          Back to Explore Area
-        </RouterLink>
+      <!-- Introduce the local biodiversity context for this area. -->
+      <div class="insight-heading">
+        <h1>Your local biodiversity context</h1>
 
-        <h1>Postcode {{ postcode }}</h1>
+        <p class="insight-location">{{ postcode }}</p>
 
-        <h3>Local biodiversity snapshot</h3>
-
-        <p>
-          Explore local species records, vegetation context and available data.
+        <p class="insight-intro">
+          A simple view of the kinds of environmental information ReGrove can bring together.
         </p>
+      </div>
+
+      <!-- Main content: what is recorded, plus a garden image and an
+           important note about how to read the data. -->
+      <div class="insight-layout">
+
+        <div class="insight-card">
+          <h3>What is recorded around here?</h3>
+
+          <div class="insight-species-box">
+            <strong>Local species observations</strong>
+
+            <p>
+              ReGrove can summarise nearby biodiversity records
+              from open datasets and group them into simple categories
+              such as birds, pollinators and other fauna.
+            </p>
+          </div>
+
+          <a
+            class="insight-data-link"
+            href="https://www.ala.org.au/"
+            target="_blank"
+            rel="noopener"
+          >
+            View data source
+          </a>
+        </div>
+
+        <div class="insight-side">
+
+          <!-- Placeholder for a garden photo for this area, to be added later. -->
+          <div class="insight-image-placeholder">
+            Garden image
+          </div>
+
+          <div class="insight-important">
+            <strong>Important</strong>
+
+            <p>
+              Fewer records do not automatically mean
+              that biodiversity has disappeared.
+              Observation effort can vary by area.
+            </p>
+          </div>
+
+        </div>
 
       </div>
 
-      <!-- Give the user a quick summary of what information is currently available. -->
-      <section class="area-summary">
+      <!-- Send the user on to Planting Ideas next. -->
+      <h2 class="insight-action-title">From local context to action</h2>
 
-        <div class="summary-item">
-          <span>Species evidence</span>
-
-          <!-- Species evidence is available when the backend returns at least one species. -->
-          <strong v-if="species.length > 0">
-            Available
-          </strong>
-
-          <strong v-else>
-            To assess
-          </strong>
-        </div>
-
-        <div class="summary-item">
-          <span>Vegetation survival</span>
-          <strong>Available</strong>
-        </div>
-
-        <div class="summary-item">
-          <span>Habitat potential</span>
-          <strong>To assess</strong>
-        </div>
-
-        <div class="summary-item">
-          <span>Data confidence</span>
-          <strong>To assess</strong>
-        </div>
-
-      </section>
-
-      <!-- Show a simple loading state while waiting for the API response. -->
-      <section
-        v-if="loading"
-        class="result-details"
-      >
-        <div class="wildlife-card">
-          <h2>What lives here?</h2>
+      <div class="insight-action">
+        <div>
+          <span>Next step</span>
 
           <p>
-            Loading local species...
+            Use your space profile + local context to explore suitable planting ideas.
           </p>
         </div>
 
-        <!-- Keep the current prototype vegetation layout while species are loading. -->
-        <div class="vegetation-card">
-
-          <h2>Vegetation context</h2>
-
-          <div class="vegetation-row">
-            <span>Plains Grassy Woodland</span>
-
-            <div class="vegetation-bar">
-              <div class="vegetation-fill vegetation-fill-1"></div>
-            </div>
-          </div>
-
-          <div class="vegetation-row">
-            <span>Swamp Scrub Wetland</span>
-
-            <div class="vegetation-bar">
-              <div class="vegetation-fill vegetation-fill-2"></div>
-            </div>
-          </div>
-
-          <div class="vegetation-row">
-            <span>Heathy Woodland</span>
-
-            <div class="vegetation-bar">
-              <div class="vegetation-fill vegetation-fill-3"></div>
-            </div>
-          </div>
-
-          <p class="vegetation-note">
-            No percentages shown until validated.
-          </p>
-
-        </div>
-      </section>
-
-      <!-- Show an error state if the API request cannot be completed. -->
-      <section
-        v-else-if="errorMessage"
-        class="result-details"
-      >
-
-        <div class="wildlife-card">
-
-          <h2>What lives here?</h2>
-
-          <p class="wildlife-note">
-            Groups spotted in local records
-          </p>
-
-          <!-- I think a clear error message is more useful than a blank result card. -->
-          <div class="insufficient-species-message">
-            <strong>Unable to load local data</strong>
-
-            <p>
-              {{ errorMessage }}
-            </p>
-          </div>
-
-        </div>
-
-        <!-- Keep the current prototype vegetation layout if the species request fails. -->
-        <div class="vegetation-card">
-
-          <h2>Vegetation context</h2>
-
-          <div class="vegetation-row">
-            <span>Plains Grassy Woodland</span>
-
-            <div class="vegetation-bar">
-              <div class="vegetation-fill vegetation-fill-1"></div>
-            </div>
-          </div>
-
-          <div class="vegetation-row">
-            <span>Swamp Scrub Wetland</span>
-
-            <div class="vegetation-bar">
-              <div class="vegetation-fill vegetation-fill-2"></div>
-            </div>
-          </div>
-
-          <div class="vegetation-row">
-            <span>Heathy Woodland</span>
-
-            <div class="vegetation-bar">
-              <div class="vegetation-fill vegetation-fill-3"></div>
-            </div>
-          </div>
-
-          <p class="vegetation-note">
-            No percentages shown until validated.
-          </p>
-
-        </div>
-
-      </section>
-
-      <!-- Show the main result layout after the API request is complete. -->
-      <section
-        v-else
-        class="result-details"
-      >
-
-        <!-- Display locally relevant species returned from the database through FastAPI. -->
-        <div class="wildlife-card">
-
-          <h2>What lives here?</h2>
-
-          <p class="wildlife-note">
-            Groups spotted in local records
-          </p>
-
-          <!-- Create one visual item for each species returned by the API. -->
-          <div
-            v-if="species.length > 0"
-            class="wildlife-groups"
-          >
-
-            <div
-              v-for="(plant, index) in species"
-              :key="plant.plant_species_id"
-              class="wildlife-item"
-            >
-
-              <!-- Alternate the circle style so neighbouring species are easier to separate. -->
-              <div
-                :class="[
-                  'wildlife-circle',
-                  index % 2 === 0
-                    ? 'circle-yellow'
-                    : 'circle-green'
-                ]"
-              ></div>
-
-              <strong>
-                {{ plant.common_name }}
-              </strong>
-
-              <span class="species-scientific-name">
-                {{ plant.scientific_name }}
-              </span>
-
-              <small class="species-native-status">
-                {{ plant.native_status }}
-              </small>
-
-            </div>
-
-          </div>
-
-          <!-- I think users should get an honest fallback message when this postcode has no species data. -->
-          <div
-            v-else
-            class="insufficient-species-message"
-          >
-
-            <strong>Insufficient local data</strong>
-
-            <p>
-              There is currently not enough local species information
-              available for postcode {{ postcode }}.
-            </p>
-
-          </div>
-
-        </div>
-
-        <!-- This vegetation section is still using the current prototype content. -->
-        <div class="vegetation-card">
-
-          <h2>Vegetation context</h2>
-
-          <div class="vegetation-row">
-
-            <span>Plains Grassy Woodland</span>
-
-            <div class="vegetation-bar">
-              <div class="vegetation-fill vegetation-fill-1"></div>
-            </div>
-
-          </div>
-
-          <div class="vegetation-row">
-
-            <span>Swamp Scrub Wetland</span>
-
-            <div class="vegetation-bar">
-              <div class="vegetation-fill vegetation-fill-2"></div>
-            </div>
-
-          </div>
-
-          <div class="vegetation-row">
-
-            <span>Heathy Woodland</span>
-
-            <div class="vegetation-bar">
-              <div class="vegetation-fill vegetation-fill-3"></div>
-            </div>
-
-          </div>
-
-          <p class="vegetation-note">
-            No percentages shown until validated.
-          </p>
-
-        </div>
-
-      </section>
+        <button
+          type="button"
+          class="next-button"
+          @click="goToPlantingIdeas"
+        >
+          See planting ideas →
+        </button>
+      </div>
 
       <!-- "Your impact" used to live in the sidebar. Show it here now
            since this page does not have a sidebar anymore. -->
