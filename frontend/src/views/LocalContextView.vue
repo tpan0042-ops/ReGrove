@@ -125,15 +125,6 @@ const searchLocalArea = () => {
 
       </div>
 
-      <!-- "Your impact" used to live in the sidebar. Show it here now
-           since this page does not have a sidebar anymore. -->
-      <div class="impact-box floating-impact">
-        <strong>Your impact</strong>
-        <h3>0</h3>
-        <p>Actions completed</p>
-        <p>Prototype</p>
-      </div>
-
     </div>
   </section>
 </template>
