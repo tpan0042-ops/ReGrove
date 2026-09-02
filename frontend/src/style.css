@@ -424,7 +424,38 @@ button {
   border: 1px solid #dddcca;
   border-radius: 12px;
   padding: 25px;
+  width: 100%;
   max-width: 650px;
+  box-sizing: border-box;
+}
+
+/* Step 2 / Step 3 placeholder cards: centered, roomy "coming soon"
+   layout instead of a small block of text sitting at the top-left
+   of the card. */
+.assessment-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+
+  min-height: 260px;
+  text-align: center;
+}
+
+.assessment-placeholder h2 {
+  margin: 0;
+  color: #1f5a30;
+  font-size: 20px;
+}
+
+.assessment-placeholder p {
+  margin: 0;
+  color: #55684f;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
 }
 
 .form-question {
