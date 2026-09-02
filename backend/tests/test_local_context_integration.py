@@ -37,7 +37,7 @@ def test_compare_context_runs_end_to_end_against_real_data():
     assert result["postcode"] == TEST_POSTCODE
     assert len(result["historical_species"]) <= 5
     assert len(result["current_species"]) <= 5
-    assert len(result["continuous_species"]) <= 5
+    assert len(result["spans_cutoff_species"]) <= 5
 
 
 def test_sparse_data_postcode_does_not_crash():

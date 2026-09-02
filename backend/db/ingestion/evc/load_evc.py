@@ -415,56 +415,43 @@ def run_dataset(
     unusable: set[str] = set()
     unclassified: set[str] = set()
     all_relationships: list[tuple[str, str, str, str, object]] = []
-    skipped: list[tuple[str, str]] = [] #for postcodes that fail due to timeout or other issues
     try:
         for index, (postcode, bbox) in enumerate(postcodes, start=1):
-            try:
-                path = fetch_postcode(
-                    year, postcode, bbox, args.cache_dir,
-                    refresh=args.refresh, offline=args.offline,
-                )
-                postcode_unclassified: list[str] = []
-                rows = read_and_validate(path, unclassified=postcode_unclassified)
-                unclassified.update(postcode_unclassified)
-                received += len(rows) + len(postcode_unclassified)
-                relationships, postcode_repairs, postcode_unusable = aggregate_postcode(
-                    config, postcode, rows, args.statement_timeout_seconds
-                )
-                repaired.update(postcode_repairs)
-                unusable.update(postcode_unusable)
-                all_relationships.extend(
-                    (postcode, item["code"], item["name"], item["status"], item["overlap_percent"])
-                    for item in relationships
-                )
-                LOG.info("EVC %s postcode %s (%s/%s): %s relationships", year, postcode,
-                         index, len(postcodes), len(relationships))
-            except (KeyboardInterrupt, SystemExit):
-                raise
-            except Exception as error:
-                LOG.warning("EVC %s postcode %s (%s/%s) skipped: %s", year, postcode,
-                            index, len(postcodes), error)
-                skipped.append((postcode, str(error)))
-
+            path = fetch_postcode(
+                year, postcode, bbox, args.cache_dir,
+                refresh=args.refresh, offline=args.offline,
+            )
+            postcode_unclassified: list[str] = []
+            rows = read_and_validate(path, unclassified=postcode_unclassified)
+            unclassified.update(postcode_unclassified)
+            received += len(rows) + len(postcode_unclassified)
+            relationships, postcode_repairs, postcode_unusable = aggregate_postcode(
+                config, postcode, rows, args.statement_timeout_seconds
+            )
+            repaired.update(postcode_repairs)
+            unusable.update(postcode_unusable)
+            all_relationships.extend(
+                (postcode, item["code"], item["name"], item["status"], item["overlap_percent"])
+                for item in relationships
+            )
+            LOG.info("EVC %s postcode %s (%s/%s): %s relationships", year, postcode,
+                     index, len(postcodes), len(relationships))
         class_count, relationship_count = write_results(
             config, source_id, year, [row[0] for row in postcodes], all_relationships
         )
-        no_intersection = (
-            len(postcodes) - len({row[0] for row in all_relationships}) - len(skipped)
-        )
+        no_intersection = len(postcodes) - len({row[0] for row in all_relationships})
         finish_data_load(
             config, load_id, status="complete", received=received,
-            accepted=received, rejected=len(skipped),
+            accepted=received, rejected=0,
             notes=(f"Scoped EVC {year} load: {class_count} source classes stored, "
                    f"{relationship_count} postcode relationships, {no_intersection} selected "
                    f"postcodes without mapped intersection, {len(repaired)} unique source "
                    f"features repaired with ST_MakeValid, {len(unusable)} unusable source "
                    f"features excluded after repair, {len(unclassified)} explicitly "
-                   f"unclassified source features excluded, {len(skipped)} postcodes skipped "
-                   f"due to infrastructure/timeout errors ({', '.join(p for p, _ in skipped) or 'none'}); "
-                   "areas calculated in EPSG:3577"),
+                   "unclassified source features excluded; areas calculated in EPSG:3577"),
         )
-        LOG.info("EVC %s complete: classes=%s relationships=%s no_intersection=%s repairs=%s skipped=%s",
-                 year, class_count, relationship_count, no_intersection, len(repaired), len(skipped))
+        LOG.info("EVC %s complete: classes=%s relationships=%s no_intersection=%s repairs=%s",
+                 year, class_count, relationship_count, no_intersection, len(repaired))
     except (KeyboardInterrupt, SystemExit) as error:
         finish_data_load(
             config, load_id, status="interrupted", received=received or None,

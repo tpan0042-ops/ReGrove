@@ -5,8 +5,8 @@ CUTOFF = date(2000, 1, 1)
 """Classify a species' occurrence evidence relative to a single cutoff.
 
     A species with evidence entirely before the cutoff is historical_only;
-    entirely on/after the cutoff is current_only; spanning the cutoff is
-    continuous. Species missing either date can't be responsibly placed
+    entirely on/after the cutoff is current_only; records on both sides of the
+    cutoff are spans_cutoff. Species missing either date can't be responsibly placed
     and are returned as 'unknown'.
     """
 def classify_species(earliest: date | None, latest: date | None) -> str:
@@ -64,8 +64,8 @@ def compare_context(
         "vegetation_retained": vegetation_retained,
         "historical_species": rank_species(species_evidence, {"historical_only"}),
         "current_species": rank_species(species_evidence, {"current_only"}),
-        "continuous_species": rank_species(species_evidence, {"spans_cutoff"}),
+        "spans_cutoff_species": rank_species(species_evidence, {"spans_cutoff"}),
         "limitation_note": (
-            "Occurrence and vegetation records show what has been documented, not confirmed presence or absence. Species without both an earliest and latest record date cannot be classified as historical, current, or continuous."
+            "Occurrence and vegetation records show what has been documented, not confirmed presence or absence. Species without both an earliest and latest record date cannot be classified as historical, current, or spanning the cutoff."
         ),
     }

@@ -2,7 +2,7 @@ from datetime import date
 from context.compare import classify_species, build_evc_comparison, rank_species, compare_context
 
 
-def test_classify_continuous():
+def test_classify_spans_cutoff():
     assert classify_species(date(1950, 1, 1), date(2020, 1, 1)) == "spans_cutoff"
 
 
@@ -19,7 +19,7 @@ def test_classify_exact_cutoff_counts_as_current():
     assert classify_species(date(2000, 1, 1), date(2000, 1, 1)) == "current_only"
 
 
-def test_classify_spans_cutoff_is_continuous():
+def test_classify_spans_cutoff_boundary():
     assert classify_species(date(1999, 12, 31), date(2000, 1, 1)) == "spans_cutoff"
 
 

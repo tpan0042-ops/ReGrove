@@ -29,5 +29,5 @@ class ComparisonResult:
     vegetation_retained: list[EvcRecord]
     historical_species: list[SpeciesEvidence]
     current_species: list[SpeciesEvidence]
-    continuous_species: list[SpeciesEvidence]
+    spans_cutoff_species: list[SpeciesEvidence]
     limitation_note: str
