@@ -26,50 +26,54 @@
 
         <div>
           <h2>What the prototype does</h2>
-          <p>Iteration 1 focuses on just two simple experiences.</p>
+          <p>Helps you make your space beautiful</p>
         </div>
       </div>
 
       <div class="prototype-cards">
 
         <div class="prototype-card">
-          <div class="card-title">
-            <div class="card-number">1</div>
+          <div class="card-top-row">
+            <div class="card-title">
+              <div class="card-number">1</div>
 
-            <div>
-              <h3>My Space</h3>
-              <strong>Property Assessment</strong>
+              <div>
+                <h3>Explore My Area</h3>
+                <strong>Local Biodiversity Context</strong>
+              </div>
             </div>
-          </div>
 
-          <p>
-            Answer a few simple questions about your outdoor space
-            and save a basic profile for your next visit.
-          </p>
-
-          <RouterLink class="primary-button" to="/assessment">
-            Start assessment
-          </RouterLink>
-        </div>
-
-        <div class="prototype-card">
-          <div class="card-title">
-            <div class="card-number">2</div>
-
-            <div>
-              <h3>Explore My Area</h3>
-              <strong>Local Biodiversity Context</strong>
-            </div>
+            <RouterLink class="primary-button" to="/explore">
+              Explore area
+            </RouterLink>
           </div>
 
           <p>
             Enter your suburb or postcode to see simple, open-data-backed
             information about biodiversity records and local vegetation.
           </p>
+        </div>
 
-          <RouterLink class="primary-button" to="/explore">
-            Explore area
-          </RouterLink>
+        <div class="prototype-card">
+          <div class="card-top-row">
+            <div class="card-title">
+              <div class="card-number">2</div>
+
+              <div>
+                <h3>Assess My Space</h3>
+                <strong>Property Assessment</strong>
+              </div>
+            </div>
+
+            <RouterLink class="primary-button" to="/assessment">
+              Start assessment
+            </RouterLink>
+          </div>
+
+          <p>
+            Answer a few simple questions about your outdoor space
+            and save a basic profile for your next visit.
+          </p>
         </div>
 
       </div>

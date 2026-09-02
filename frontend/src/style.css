@@ -131,7 +131,10 @@ button {
 }
 
 .prototype-section {
+  max-width: 1180px;
+  margin: 0 auto;
   padding: 10px 80px 30px;
+  box-sizing: border-box;
 }
 
 .prototype-section h2 {
@@ -160,64 +163,90 @@ button {
 
 .prototype-cards {
   display: flex;
-  gap: 30px;
-  margin-top: 30px;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 26px;
 }
 
 .prototype-card {
   background-color: white;
   border: 1px solid #d7d8c8;
-  border-radius: 18px;
-  padding: 28px;
-  width: 50%;
-  display: flex;
-  flex-direction: column;
+  border-radius: 14px;
+  padding: 18px 26px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
-.prototype-card .primary-button {
-  align-self: flex-start;
-  margin-top: auto;
+.card-top-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
 }
 
 .card-title {
   display: flex;
   align-items: center;
-  gap: 20px;
-  margin-bottom: 25px;
+  gap: 14px;
 }
 
 .card-number {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  flex-shrink: 0;
   background-color: #e2efd1;
-  padding: 15px 20px;
-  border-radius: 15px;
-  font-size: 22px;
+  border-radius: 7px;
+  font-size: 13px;
   font-weight: bold;
+  color: #2d5f35;
 }
 
 .prototype-card h3 {
-  font-size: 23px;
-  margin: 0 0 5px;
+  font-size: 17px;
+  margin: 0 0 2px;
 }
 
 .prototype-card strong {
-  font-size: 14px;
+  font-size: 12px;
+  font-weight: 600;
   color: #667263;
 }
 
+.prototype-card .primary-button {
+  flex-shrink: 0;
+  padding: 9px 20px;
+  border-radius: 8px;
+  font-size: 13px;
+}
+
 .prototype-card p {
+  margin: 10px 0 0;
   color: #667263;
-  line-height: 1.6;
-  margin-bottom: 28px;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+@media (max-width: 700px) {
+  .card-top-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
 }
 
 .data-source-section {
   display: flex;
   align-items: center;
   gap: 40px;
-  margin: 0 80px 40px;
-  padding: 18px 25px;
+  max-width: 1180px;
+  margin: 0 auto 40px;
+  padding: 18px 80px;
   background-color: #f1f6e8;
   border-radius: 10px;
+  box-sizing: border-box;
 }
 
 .data-source-section strong {
@@ -424,7 +453,38 @@ button {
   border: 1px solid #dddcca;
   border-radius: 12px;
   padding: 25px;
+  width: 100%;
   max-width: 650px;
+  box-sizing: border-box;
+}
+
+/* Step 2 / Step 3 placeholder cards: centered, roomy "coming soon"
+   layout instead of a small block of text sitting at the top-left
+   of the card. */
+.assessment-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+
+  min-height: 260px;
+  text-align: center;
+}
+
+.assessment-placeholder h2 {
+  margin: 0;
+  color: #1f5a30;
+  font-size: 20px;
+}
+
+.assessment-placeholder p {
+  margin: 0;
+  color: #55684f;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
 }
 
 .form-question {
@@ -569,7 +629,10 @@ button {
 .explore-page-overlay {
   position: relative;
   min-height: 760px;
+  max-width: 1180px;
+  margin: 0 auto;
   padding: 40px 60px;
+  box-sizing: border-box;
 }
 
 .explore-layout {
@@ -723,7 +786,10 @@ button {
 .area-result-page-overlay {
   position: relative;
   min-height: 780px;
+  max-width: 1180px;
+  margin: 0 auto;
   padding: 40px 60px;
+  box-sizing: border-box;
 }
 
 .area-result-heading {
