@@ -60,18 +60,6 @@ button {
   color: #2d5f35;
 }
 
-.main-nav .get-started {
-  background-color: #2d5f35;
-  color: white;
-  padding: 12px 20px;
-  border-radius: 10px;
-}
-
-.main-nav .get-started:hover {
-  color: white;
-  background-color: #234c2a;
-}
-
 .hero-banner {
   position: relative;
   width: 100%;
@@ -451,8 +439,11 @@ button {
 .assessment-heading {
   text-align: center;
   margin-bottom: 25px;
-  /* A darker green reads better over the photo than the usual green. */
-  color: #1f4a28;
+
+  /* White reads much better over the photo than dark green does - the
+     shadow keeps it legible even over the lighter parts of the photo. */
+  color: white;
+  text-shadow: 0 4px 24px rgba(0, 0, 0, 0.25);
 }
 
 .assessment-heading h1 {
@@ -755,6 +746,15 @@ button {
   max-width: 720px;
 }
 
+/* These headings sit directly on the (blurred) photo behind them, so
+   white text with a soft shadow reads far better than the site's usual
+   dark green. */
+.explore-main h1,
+.explore-main h3 {
+  color: white;
+  text-shadow: 0 4px 24px rgba(0, 0, 0, 0.25);
+}
+
 .explore-main h1 {
   margin: 0 0 5px;
   font-size: 32px;
@@ -931,15 +931,29 @@ button {
 }
 
 .back-area-link {
-  display: block;
-  color: #667263;
-  text-decoration: none;
-  font-size: 11px;
+  display: inline-block;
   margin-bottom: 22px;
+
+  /* Same button look as .next-button below, just smaller - a plain text
+     link was too easy to miss sitting on top of the photo. */
+  background-color: #1f5a30;
+  color: white;
+  border-radius: 7px;
+  padding: 11px 24px;
+  font-size: 11px;
+  text-decoration: none;
 }
 
 .back-area-link:hover {
-  color: #2d5f35;
+  background-color: #174726;
+  color: white;
+}
+
+/* Same photo-legibility fix as the other full-photo pages. */
+.area-result-heading h1,
+.area-result-heading h3 {
+  color: white;
+  text-shadow: 0 4px 24px rgba(0, 0, 0, 0.25);
 }
 
 .area-result-heading h1 {
@@ -954,7 +968,7 @@ button {
 
 .area-result-heading p {
   margin-top: 0;
-  color: #667263;
+  color: #1f2d22;
   font-size: 12px;
 }
 

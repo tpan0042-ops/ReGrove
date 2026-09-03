@@ -12,10 +12,6 @@
         <RouterLink to="/explore">Explore Area</RouterLink>
         <RouterLink to="/assessment">My Space</RouterLink>
         <RouterLink to="/about">About</RouterLink>
-
-        <RouterLink class="get-started" to="/assessment">
-          Get Started
-        </RouterLink>
       </nav>
 
     </div>
