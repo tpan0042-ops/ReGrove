@@ -20,6 +20,7 @@ class SpeciesEvidence:
     earliest_record_date: date | None
     latest_record_date: date | None
     classification: str = "unknown"
+    confidence: str = "Low"
 
 #class to hold the comparison result for a given postcode
 @dataclass

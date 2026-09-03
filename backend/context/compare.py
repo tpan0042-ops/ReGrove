@@ -1,4 +1,5 @@
 from datetime import date
+from context.confidence import classify_confidence
 
 CUTOFF = date(2000, 1, 1)
 
@@ -54,6 +55,9 @@ def compare_context(
     for species in species_evidence:
         species["classification"] = classify_species(
             species.get("earliest_record_date"), species.get("latest_record_date")
+        )
+        species["confidence"] = classify_confidence(
+            species.get("record_count", 0), species.get("latest_record_date")
         )
 
     vegetation_lost, vegetation_retained = build_evc_comparison(historical_evc, current_evc)
