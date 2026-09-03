@@ -1,5 +1,6 @@
 from datetime import date
-from context.compare import classify_species, build_evc_comparison, rank_species, compare_context
+from context.classify import classify_species
+from context.compare import build_evc_comparison, rank_species, compare_context
 
 
 def test_classify_spans_cutoff():
@@ -15,7 +16,6 @@ def test_classify_current_only():
 
 
 def test_classify_exact_cutoff_counts_as_current():
-    # Boundary check: a record exactly on the cutoff date is treated as current.
     assert classify_species(date(2000, 1, 1), date(2000, 1, 1)) == "current_only"
 
 

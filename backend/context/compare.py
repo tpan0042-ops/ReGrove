@@ -1,30 +1,7 @@
-from datetime import date
+from context.classify import classify_species
 from context.confidence import classify_confidence
 
-CUTOFF = date(2000, 1, 1)
 
-"""Classify a species' occurrence evidence relative to a single cutoff.
-
-    A species with evidence entirely before the cutoff is historical_only;
-    entirely on/after the cutoff is current_only; records on both sides of the
-    cutoff are spans_cutoff. Species missing either date can't be responsibly placed
-    and are returned as 'unknown'.
-    """
-def classify_species(earliest: date | None, latest: date | None) -> str:
-
-    if earliest is None or latest is None:
-        return "unknown"
-
-    is_historical = earliest < CUTOFF
-    is_current = latest >= CUTOFF
-
-    if is_historical and is_current:
-        return "spans_cutoff"
-    if is_historical:
-        return "historical_only"
-    return "current_only"
-
-#compare historical and current EVC records to determine which have been lost or retained
 def build_evc_comparison(
     historical_evc: list[dict], current_evc: list[dict]
 ) -> tuple[list[dict], list[dict]]:
@@ -38,14 +15,13 @@ def build_evc_comparison(
     vegetation_retained = [row for row in historical_evc if row["evc_code"] in retained_codes]
     return vegetation_lost, vegetation_retained
 
-#ranks species by record count and filters by classification, returning the top N species
+
 def rank_species(
-    species_list: list[dict], classification_filter: set[str], limit: int = 5
-) -> list[dict]:
+    species_list: list[dict], classification_filter: set[str], limit: int = 5) -> list[dict]:
     matching = [s for s in species_list if s["classification"] in classification_filter]
     return sorted(matching, key=lambda s: s["record_count"], reverse=True)[:limit]
 
-#compares historical and current EVC records and species evidence for a given postcode, returning a structured result with limitations
+
 def compare_context(
     postcode: str,
     historical_evc: list[dict],
@@ -57,7 +33,9 @@ def compare_context(
             species.get("earliest_record_date"), species.get("latest_record_date")
         )
         species["confidence"] = classify_confidence(
-            species.get("record_count", 0), species.get("latest_record_date")
+            species.get("record_count", 0),
+            species.get("earliest_record_date"),
+            species.get("latest_record_date"),
         )
 
     vegetation_lost, vegetation_retained = build_evc_comparison(historical_evc, current_evc)
