@@ -4,7 +4,7 @@ import HomeView from '../views/HomeView.vue'
 import AssessmentView from '../views/AssessmentView.vue'
 import LocalContextView from '../views/LocalContextView.vue'
 import AreaResultView from '../views/AreaResultView.vue'
-import PlantingIdeasView from '../views/PlantingIdeasView.vue'
+import AboutView from '../views/AboutView.vue'
 
 const routes = [
   {
@@ -28,9 +28,11 @@ const routes = [
     component: AreaResultView
   },
   {
-    path: '/planting',
-    name: 'PlantingIdeas',
-    component: PlantingIdeasView
+    // The About page itself is not built yet, just routed to a
+    // placeholder for now so the header link is not dead.
+    path: '/about',
+    name: 'About',
+    component: AboutView
   }
 ]
 

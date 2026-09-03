@@ -25,3 +25,5 @@ Victorian Bioregions/
 *.dump
 *.sql.gz
 .cache/
+backend/lambda_package/
+backend/regrove_api.zip

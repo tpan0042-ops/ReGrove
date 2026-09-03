@@ -1,7 +1,8 @@
 <script setup>
+// This page shows the local biodiversity results for the postcode selected by the user.
+
 import { ref, onMounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
-import AppSidebar from '../components/AppSidebar.vue'
 import ContextNotice from '../components/ContextNotice.vue'
 
 const route = useRoute()
@@ -43,11 +44,16 @@ watch(() => route.params.postcode, (newPostcode) => {
 </script>
 
 <template>
-  <div class="page-layout">
+  <section class="area-result-page">
+    <img
+      class="area-result-page-image"
+      src="../assets/postcode_ResultPage.png"
+      alt="A meadow of native wildflowers"
+    />
 
-    <AppSidebar />
+    <div class="area-result-page-tint"></div>
 
-    <main class="page-content">
+    <div class="area-result-page-overlay">
 
       <div v-if="loading">
         <p>Loading area data...</p>
@@ -65,7 +71,8 @@ watch(() => route.params.postcode, (newPostcode) => {
             Back to Explore Area
           </RouterLink>
 
-          <h1>{{ areaData.postcode }}</h1>
+          <h1>Postcode {{ areaData.postcode }}</h1>
+
           <h3>Local biodiversity snapshot</h3>
 
           <p>
@@ -76,85 +83,80 @@ watch(() => route.params.postcode, (newPostcode) => {
 
         <ContextNotice :suburb="areaData.postcode" />
 
-        <section class="area-summary">
+        <section class="species-timeline">
 
-          <div class="summary-item">
-            <span>Vegetation retained</span>
-            <strong>{{ areaData.vegetation_retained.length }} type(s)</strong>
+          <h2 class="timeline-heading">Historical</h2>
+
+          <div class="timeline-cards">
+            <div
+              v-for="species in areaData.historical_species"
+              :key="species.scientific_name"
+              class="timeline-card"
+            >
+              <div class="species-result-text">
+                <strong>{{ species.common_name || species.scientific_name }}</strong>
+                <span>Confidence: {{ species.confidence }}</span>
+              </div>
+            </div>
           </div>
 
-          <div class="summary-item">
-            <span>Vegetation lost</span>
-            <strong>{{ areaData.vegetation_lost.length }} type(s)</strong>
-          </div>
+          <p v-if="areaData.historical_species.length === 0">
+            No historical species evidence found for this area.
+          </p>
 
-          <div class="summary-item">
-            <span>Current species evidence</span>
-            <strong>{{ areaData.current_species.length }} found</strong>
-          </div>
+          <h2 class="timeline-heading">Current</h2>
 
-          <div class="summary-item">
-            <span>Historical species evidence</span>
-            <strong>{{ areaData.historical_species.length }} found</strong>
-          </div>
-
-        </section>
-
-        <section class="result-details">
-
-          <div class="wildlife-card">
-
-            <h2>What lives here now?</h2>
-
-            <p class="wildlife-note">
-              Species with current occurrence evidence
-            </p>
-
+          <div class="timeline-cards">
             <div
               v-for="species in areaData.current_species"
               :key="species.scientific_name"
-              class="species-row"
+              class="timeline-card timeline-card-current"
             >
-              <strong>{{ species.common_name || species.scientific_name }}</strong>
-              <span>Confidence: {{ species.confidence }}</span>
-            </div>
-
-            <p v-if="areaData.current_species.length === 0">
-              No current species evidence found for this area.
-            </p>
-
-          </div>
-
-          <div class="vegetation-card">
-
-            <h2>Vegetation context</h2>
-
-            <div
-              v-for="evc in areaData.vegetation_retained"
-              :key="evc.evc_code"
-              class="vegetation-row"
-            >
-              <span>{{ evc.evc_name }}</span>
-
-              <div class="vegetation-bar">
-                <div
-                  class="vegetation-fill"
-                  :style="{ width: evc.overlap_percent + '%' }"
-                ></div>
+              <div class="species-result-text">
+                <strong>{{ species.common_name || species.scientific_name }}</strong>
+                <span>Confidence: {{ species.confidence }}</span>
               </div>
             </div>
+          </div>
 
-            <p class="vegetation-note">
-              {{ areaData.limitation_note }}
-            </p>
+          <p v-if="areaData.current_species.length === 0">
+            No current species evidence found for this area.
+          </p>
 
+          <h2 class="timeline-heading">Vegetation context</h2>
+
+          <div
+            v-for="evc in areaData.vegetation_retained"
+            :key="evc.evc_code"
+            class="vegetation-row"
+          >
+            <span>{{ evc.evc_name }}</span>
+
+            <div class="vegetation-bar">
+              <div
+                class="vegetation-fill"
+                :style="{ width: evc.overlap_percent + '%' }"
+              ></div>
+            </div>
+          </div>
+
+          <p class="vegetation-note">
+            {{ areaData.limitation_note }}
+          </p>
+
+          <div class="timeline-actions">
+            <RouterLink
+              class="next-button"
+              to="/assessment"
+            >
+              Next ->
+            </RouterLink>
           </div>
 
         </section>
 
       </div>
 
-    </main>
-
-  </div>
+    </div>
+  </section>
 </template>
