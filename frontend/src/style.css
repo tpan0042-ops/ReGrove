@@ -761,3 +761,10 @@ button {
   font-size: 10px;
   margin: 25px 0 0;
 }
+.species-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid #eee;
+  font-size: 12px;
+}

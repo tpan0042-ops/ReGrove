@@ -1,5 +1,45 @@
 <script setup>
+import { ref, onMounted, watch } from 'vue'
+import { useRoute } from 'vue-router'
 import AppSidebar from '../components/AppSidebar.vue'
+import ContextNotice from '../components/ContextNotice.vue'
+
+const route = useRoute()
+
+const areaData = ref(null)
+const loading = ref(true)
+const error = ref(null)
+
+const API_BASE = 'https://c21wjdpl8f.execute-api.ap-southeast-2.amazonaws.com/default/regrove_api'
+
+async function loadAreaData(postcode) {
+  loading.value = true
+  error.value = null
+  areaData.value = null
+
+  try {
+    const response = await fetch(`${API_BASE}/api/area/${postcode}`)
+    const data = await response.json()
+
+    if (!data.supported) {
+      error.value = `We do not have data for postcode ${postcode} yet.`
+    } else {
+      areaData.value = data
+    }
+  } catch (err) {
+    error.value = 'Something went wrong loading this area. Please try again.'
+  } finally {
+    loading.value = false
+  }
+}
+
+onMounted(() => {
+  loadAreaData(route.params.postcode)
+})
+
+watch(() => route.params.postcode, (newPostcode) => {
+  loadAreaData(newPostcode)
+})
 </script>
 
 <template>
@@ -9,126 +49,110 @@ import AppSidebar from '../components/AppSidebar.vue'
 
     <main class="page-content">
 
-      <!-- Area heading -->
-      <div class="area-result-heading">
-
-        <RouterLink class="back-area-link" to="/explore">
-          Back to Explore Area
-        </RouterLink>
-
-        <h1>Clayton 3168</h1>
-        <h3>Local biodiversity snapshot</h3>
-
-        <p>
-          Explore local species records, vegetation context and available data.
-        </p>
-
+      <div v-if="loading">
+        <p>Loading area data...</p>
       </div>
 
-      <!-- Area data summary -->
-      <section class="area-summary">
+      <div v-else-if="error">
+        <p>{{ error }}</p>
+      </div>
 
-        <div class="summary-item">
-          <span>Species evidence</span>
-          <strong>Available</strong>
-        </div>
+      <div v-else-if="areaData">
 
-        <div class="summary-item">
-          <span>Vegetation survival</span>
-          <strong>Available</strong>
-        </div>
+        <div class="area-result-heading">
 
-        <div class="summary-item">
-          <span>Habitat potential</span>
-          <strong>To assess</strong>
-        </div>
+          <RouterLink class="back-area-link" to="/explore">
+            Back to Explore Area
+          </RouterLink>
 
-        <div class="summary-item">
-          <span>Data confidence</span>
-          <strong>To assess</strong>
-        </div>
+          <h1>{{ areaData.postcode }}</h1>
+          <h3>Local biodiversity snapshot</h3>
 
-      </section>
-
-      <!-- Biodiversity details -->
-      <section class="result-details">
-
-        <!-- Wildlife groups -->
-        <div class="wildlife-card">
-
-          <h2>What lives here?</h2>
-
-          <p class="wildlife-note">
-            Groups spotted in local records
-          </p>
-
-          <div class="wildlife-groups">
-
-            <div class="wildlife-item">
-              <div class="wildlife-circle circle-yellow"></div>
-              <strong>Birds</strong>
-            </div>
-
-            <div class="wildlife-item">
-              <div class="wildlife-circle circle-green"></div>
-              <strong>Plants</strong>
-            </div>
-
-            <div class="wildlife-item">
-              <div class="wildlife-circle circle-yellow"></div>
-              <strong>Insects</strong>
-            </div>
-
-            <div class="wildlife-item">
-              <div class="wildlife-circle circle-green"></div>
-              <strong>Mammals</strong>
-            </div>
-
-            <div class="wildlife-item">
-              <div class="wildlife-circle circle-yellow"></div>
-              <strong>Reptiles</strong>
-            </div>
-
-          </div>
-
-        </div>
-
-        <!-- Vegetation context -->
-        <div class="vegetation-card">
-
-          <h2>Vegetation context</h2>
-
-          <div class="vegetation-row">
-            <span>Plains Grassy Woodland</span>
-
-            <div class="vegetation-bar">
-              <div class="vegetation-fill vegetation-fill-1"></div>
-            </div>
-          </div>
-
-          <div class="vegetation-row">
-            <span>Swamp Scrub Wetland</span>
-
-            <div class="vegetation-bar">
-              <div class="vegetation-fill vegetation-fill-2"></div>
-            </div>
-          </div>
-
-          <div class="vegetation-row">
-            <span>Heathy Woodland</span>
-
-            <div class="vegetation-bar">
-              <div class="vegetation-fill vegetation-fill-3"></div>
-            </div>
-          </div>
-
-          <p class="vegetation-note">
-            No percentages shown until validated.
+          <p>
+            Explore local species records, vegetation context and available data.
           </p>
 
         </div>
 
-      </section>
+        <ContextNotice :suburb="areaData.postcode" />
+
+        <section class="area-summary">
+
+          <div class="summary-item">
+            <span>Vegetation retained</span>
+            <strong>{{ areaData.vegetation_retained.length }} type(s)</strong>
+          </div>
+
+          <div class="summary-item">
+            <span>Vegetation lost</span>
+            <strong>{{ areaData.vegetation_lost.length }} type(s)</strong>
+          </div>
+
+          <div class="summary-item">
+            <span>Current species evidence</span>
+            <strong>{{ areaData.current_species.length }} found</strong>
+          </div>
+
+          <div class="summary-item">
+            <span>Historical species evidence</span>
+            <strong>{{ areaData.historical_species.length }} found</strong>
+          </div>
+
+        </section>
+
+        <section class="result-details">
+
+          <div class="wildlife-card">
+
+            <h2>What lives here now?</h2>
+
+            <p class="wildlife-note">
+              Species with current occurrence evidence
+            </p>
+
+            <div
+              v-for="species in areaData.current_species"
+              :key="species.scientific_name"
+              class="species-row"
+            >
+              <strong>{{ species.common_name || species.scientific_name }}</strong>
+              <span>Confidence: {{ species.confidence }}</span>
+            </div>
+
+            <p v-if="areaData.current_species.length === 0">
+              No current species evidence found for this area.
+            </p>
+
+          </div>
+
+          <div class="vegetation-card">
+
+            <h2>Vegetation context</h2>
+
+            <div
+              v-for="evc in areaData.vegetation_retained"
+              :key="evc.evc_code"
+              class="vegetation-row"
+            >
+              <span>{{ evc.evc_name }}</span>
+
+              <div class="vegetation-bar">
+                <div
+                  class="vegetation-fill"
+                  :style="{ width: evc.overlap_percent + '%' }"
+                ></div>
+              </div>
+            </div>
+
+            <p class="vegetation-note">
+              {{ areaData.limitation_note }}
+            </p>
+
+          </div>
+
+        </section>
+
+      </div>
 
     </main>
 

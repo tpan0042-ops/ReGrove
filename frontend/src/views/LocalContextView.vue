@@ -1,9 +1,16 @@
 <script setup>
 import { ref } from 'vue'
+import { useRouter } from 'vue-router'
 import AppSidebar from '../components/AppSidebar.vue'
+import ContextNotice from '../components/ContextNotice.vue'
 
-// Store the suburb or postcode entered by the user.
+const router = useRouter()
 const searchArea = ref('')
+
+function goToArea() {
+  if (searchArea.value.trim() === '') return
+  router.push(`/area/${searchArea.value.trim()}`)
+}
 </script>
 
 <template>
@@ -23,14 +30,17 @@ const searchArea = ref('')
             Search by suburb or postcode to explore open-data-backed local context.
           </p>
 
+          <ContextNotice suburb="your selected area" />
+
           <div class="area-search">
             <input
               type="text"
               v-model="searchArea"
               placeholder="Search suburb or postcode"
+              @keyup.enter="goToArea"
             >
 
-            <button type="button">
+            <button type="button" @click="goToArea">
               Search
             </button>
           </div>
@@ -38,13 +48,13 @@ const searchArea = ref('')
           <p class="popular-title">Popular searches</p>
 
           <div class="popular-searches">
-            <RouterLink to="/area/clayton-3168">
+            <RouterLink to="/area/3168">
               Clayton 3168
             </RouterLink>
-            <RouterLink to="/area/blackburn-3130">
+            <RouterLink to="/area/3130">
               Blackburn 3130
             </RouterLink>
-            <RouterLink to="/area/parkville-3052">
+            <RouterLink to="/area/3052">
               Parkville 3052
             </RouterLink>
           </div>
