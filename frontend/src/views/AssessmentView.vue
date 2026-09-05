@@ -56,19 +56,19 @@ const nextStep = () => {
           <!-- Step 2 is currently a placeholder for later questions. -->
           <div
             v-if="currentStep === 2"
-            class="assessment-form"
+            class="assessment-form assessment-placeholder"
           >
             <h2>Step 2</h2>
-            <p>The next assessment questions will go here.</p>
+            <p>Coming Soon</p>
           </div>
 
           <!-- Step 3 is currently a placeholder for the final questions. -->
           <div
             v-if="currentStep === 3"
-            class="assessment-form"
+            class="assessment-form assessment-placeholder"
           >
             <h2>Step 3</h2>
-            <p>The final assessment questions will go here.</p>
+            <p>Coming Soon</p>
           </div>
 
         </div>
@@ -91,15 +91,6 @@ const nextStep = () => {
       <div class="myspace-image-text">
         <strong>Small spaces matter.</strong>
         <p>Even a balcony can support local biodiversity.</p>
-      </div>
-
-      <!-- "Your impact" used to live in the sidebar. Show it here now
-           since this page does not have a sidebar anymore. -->
-      <div class="impact-box floating-impact">
-        <strong>Your impact</strong>
-        <h3>0</h3>
-        <p>Actions completed</p>
-        <p>Prototype</p>
       </div>
 
     </div>

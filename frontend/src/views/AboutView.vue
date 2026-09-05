@@ -6,6 +6,6 @@
 <template>
   <main class="page-content">
     <h1>About</h1>
-    <p>This page is not built yet. More information about ReGrove will go here later.</p>
+    <p>Coming Soon</p>
   </main>
 </template>

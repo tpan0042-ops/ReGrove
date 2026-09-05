@@ -7,3 +7,23 @@ __pycache__/
 
 .env
 .DS_Store
+setup-env.ps1
+
+
+# Raw/downloaded spatial data and generated ingestion artefacts never belong in Git.
+VBA_flora/
+VBA_fauna/
+Victorian Bioregions/
+*.shp
+*.shx
+*.dbf
+*.prj
+*.cpg
+*.gdb/
+*.gpkg
+*.geojsons
+*.dump
+*.sql.gz
+.cache/
+backend/lambda_package/
+backend/regrove_api.zip

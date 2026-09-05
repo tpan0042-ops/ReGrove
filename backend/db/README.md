@@ -1,8 +1,10 @@
 # ReGrove database v1
 
-This is the first research-backed PostgreSQL/PostGIS schema. It contains only
-the 19 approved tables. The schema is intentionally broader than the Iteration
-1 application so it can remain fauna-ready without an early redesign.
+This is the first research-backed PostgreSQL/PostGIS schema. Migrations 001 and
+002 contain the 19 approved v1 tables. Migration 003 adds one narrowly scoped
+`plant_occurrence_summary` relationship because documented VBA flora occurrence
+cannot be represented correctly as a trait, suitability conclusion, or plant
+resource assertion.
 
 Iteration 1 operational priority is:
 
@@ -44,6 +46,8 @@ docker compose exec -T db psql -v ON_ERROR_STOP=1 -U regrove -d regrove \
 docker compose exec -T db psql -v ON_ERROR_STOP=1 -U regrove -d regrove \
   < backend/db/migrations/002_iteration1_scope_adjustments.sql
 docker compose exec -T db psql -v ON_ERROR_STOP=1 -U regrove -d regrove \
+  < backend/db/migrations/003_vba_occurrence_support.sql
+docker compose exec -T db psql -v ON_ERROR_STOP=1 -U regrove -d regrove \
   < backend/db/seeds/001_sample_data.sql
 ```
 
@@ -59,6 +63,8 @@ With the migration and sample seed applied:
 ```bash
 docker compose exec -T db psql -v ON_ERROR_STOP=1 -U regrove -d regrove \
   < backend/db/tests/001_schema_tests.sql
+docker compose exec -T db psql -v ON_ERROR_STOP=1 -U regrove -d regrove \
+  < backend/db/tests/002_vba_occurrence_tests.sql
 ```
 
 The test transaction rolls back its own attempted writes. It checks schema and
@@ -101,3 +107,16 @@ uses PostgreSQL 16.
 Foreign keys use PostgreSQL's default `NO ACTION` deletion behaviour. No
 cascade deletes are introduced because provenance-bearing evidence should not
 be removed implicitly.
+
+## Real-data ingestion
+
+Reproducible reference-data loaders live in
+[`ingestion/README.md`](ingestion/README.md). They are deliberately separate
+from the sample seed file. The implemented spatial foundation loads real ABS
+ASGS 2021 Postal Area geometry and official Victorian 1750/2005 EVC products.
+The bioregion loader uses the official downloaded Victorian `VBIOREG100` SHP;
+existing national IBRA rows remain as historical/provenance data and are not
+ mixed into current Victorian validation. VicFlora supplies plant taxonomy/status. Local VBA flora/fauna SHP
+loaders provide postcode-level occurrence context with `SOURCE` and `DATA_LOAD`
+provenance. Observation counts are not abundance, grid intersections are not
+property observations, and flora occurrence is not planting suitability.
